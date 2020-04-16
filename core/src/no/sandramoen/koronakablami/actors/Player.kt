@@ -12,20 +12,12 @@ class Player(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
         loadAnimation(BaseGame.textureAtlas!!.findRegion("player"))
         width = Gdx.graphics.width * .125f
         height = Gdx.graphics.height * .25f * (Gdx.graphics.width.toFloat() / Gdx.graphics.height.toFloat())
-        Gdx.app.log("Player", "ratio: ${Gdx.graphics.width.toFloat() / Gdx.graphics.height.toFloat()}")
-        // scaleBy(-.25f)
 
         setBoundaryPolygon(8)
 
-        if (Gdx.app.type == Android) {
-            setAcceleration(3200f) // time to reach max speed = 800f/3200f = .25 seconds
-            setMaxSpeed(800f) // pixels/seconds
-            setDeceleration(3200f) // time to reach zero speed = 800f/3200f = .25 second
-        } else {
-            setAcceleration(1600f) // time to reach max speed = 400/1600 = .25 seconds
-            setMaxSpeed(400f) // pixels/seconds
-            setDeceleration(1600f) // time to reach zero speed = 400/1600 = .25 seconds
-        }
+        setAcceleration(Gdx.graphics.height / 1f) // pixels/seconds
+        setMaxSpeed(Gdx.graphics.height / 4f)
+        setDeceleration(Gdx.graphics.height / 1f)
     }
 
     override fun act(dt: Float) {
@@ -48,12 +40,12 @@ class Player(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
                 accelerateAtAngle(180f)
             else if (Gdx.input.isKeyPressed(Keys.D))
                 accelerateAtAngle(0f)
-            if (Gdx.input.isKeyPressed(Keys.SPACE))
-                shoot()
         }
     }
 
     fun shoot() {
-        Gdx.app.log("Player", "pew-pew!")
+        val laser = Laser(0f, 0f, this.stage)
+        laser.centerAtActor(this)
+        laser.setPosition(laser.x, laser.y + height / 2)
     }
 }
