@@ -10,7 +10,11 @@ class GameUtils {
         }
 
         fun saveGameState() {
-            // BaseGame.prefs!!.putInteger("highscore", BaseGame.highscore)
+            try {
+                BaseGame.prefs!!.putLong("highScore", BaseGame.highScore)
+            } catch (error: Error) {
+                BaseGame.prefs!!.putLong("highScore", 999999999999999999L)
+            }
             BaseGame.prefs!!.flush()
         }
     }

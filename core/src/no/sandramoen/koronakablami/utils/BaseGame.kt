@@ -43,6 +43,7 @@ abstract class BaseGame : Game(), AssetErrorListener {
 
         // game state
         var prefs: Preferences? = null
+        var highScore: Long = 0
 
         fun setActiveScreen(s: BaseScreen) {
             game?.setScreen(s)
@@ -54,6 +55,7 @@ abstract class BaseGame : Game(), AssetErrorListener {
 
         // global variables
         prefs = Gdx.app.getPreferences("koronakablamiGameState")
+        highScore = prefs!!.getLong("highScore")
 
         // asset manager
         assetManager = AssetManager()

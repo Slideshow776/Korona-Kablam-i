@@ -13,6 +13,7 @@ public class AndroidLauncher extends AndroidApplication {
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
 		config.useAccelerometer = true;
 		config.useCompass = false;
+		config.useImmersiveMode = true;
 		initialize(new KoronaKablamIGame(), config);
 	}
 }
