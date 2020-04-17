@@ -63,7 +63,7 @@ open class BaseActor(x: Float, y: Float, s: Stage) : Group() {
     }
 
     // Graphics ---------------------------------------------------------------------------------------------------
-    fun setAnimation(anim: Animation<TextureRegion>) { // TODO: might not need this
+    private fun setAnimation(anim: Animation<TextureRegion>, loop: Boolean) { // TODO: might not need this
         animation = anim
         val tr: TextureRegion = animation!!.getKeyFrame(0.toFloat())
         val w: Float = tr.regionWidth.toFloat()
@@ -73,6 +73,11 @@ open class BaseActor(x: Float, y: Float, s: Stage) : Group() {
 
         if (boundaryPolygon == null)
             setBoundaryRectangle()
+
+        if (loop)
+            anim.playMode = Animation.PlayMode.LOOP
+        else
+            anim.playMode = Animation.PlayMode.NORMAL
     }
 
     // Graphics ---------------------------------------------------------------------------------------------------
@@ -104,7 +109,7 @@ open class BaseActor(x: Float, y: Float, s: Stage) : Group() {
             anim.playMode = Animation.PlayMode.NORMAL
 
         if (animation == null)
-            setAnimation(anim)
+            setAnimation(anim, loop)
 
         return anim
     }
@@ -132,14 +137,17 @@ open class BaseActor(x: Float, y: Float, s: Stage) : Group() {
             anim.playMode = Animation.PlayMode.NORMAL
 
         if (animation == null)
-            setAnimation(anim)
+            setAnimation(anim, loop)
 
         return anim
     }
 
-    fun loadAnimation(region: TextureAtlas.AtlasRegion): Animation<TextureRegion> {
-        setAnimation(Animation(1f, region))
-        return Animation(1f, region)
+    fun loadImage(region: TextureAtlas.AtlasRegion) {
+        setAnimation(Animation(1f, region), false)
+    }
+
+    fun loadAnimation(region: Array<TextureAtlas.AtlasRegion>, frameDuration: Float, loop: Boolean) {
+        setAnimation(Animation(frameDuration, region), loop)
     }
 
     fun isAnimationFinished(): Boolean {

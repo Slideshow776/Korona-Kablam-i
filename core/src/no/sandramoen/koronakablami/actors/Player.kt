@@ -9,7 +9,7 @@ import no.sandramoen.koronakablami.utils.BaseGame
 
 class Player(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
     init {
-        loadAnimation(BaseGame.textureAtlas!!.findRegion("player"))
+        loadImage(BaseGame.textureAtlas!!.findRegion("player"))
         width = Gdx.graphics.width * .125f
         height = Gdx.graphics.height * .25f * (Gdx.graphics.width.toFloat() / Gdx.graphics.height.toFloat())
 

@@ -29,7 +29,7 @@ class SplashScreen : BaseScreen() {
 
         // black overlay
         val background = BaseActor(0f, 0f, mainStage)
-        background.loadAnimation(BaseGame.textureAtlas!!.findRegion("whitePixel"))
+        background.loadImage(BaseGame.textureAtlas!!.findRegion("whitePixel"))
         background.color = Color.BLACK
         background.touchable = Touchable.childrenOnly
         background.setSize(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())

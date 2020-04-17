@@ -9,7 +9,7 @@ import no.sandramoen.koronakablami.utils.BaseGame
 
 class Laser(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
     init {
-        loadAnimation(BaseGame.textureAtlas!!.findRegion("laser"))
+        loadImage(BaseGame.textureAtlas!!.findRegion("laser"))
         width = Gdx.graphics.width * .03f
         height = Gdx.graphics.height * .07f * (Gdx.graphics.width.toFloat() / Gdx.graphics.height.toFloat())
 

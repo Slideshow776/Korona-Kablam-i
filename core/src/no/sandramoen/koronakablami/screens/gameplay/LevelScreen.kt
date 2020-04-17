@@ -25,7 +25,7 @@ class LevelScreen : BaseScreen() {
 
     lateinit var player: Player
 
-    private var playerMayShoot = true
+    private var playerMayShoot = false
     private var gameOver = true
     private var pause = true
     private var score = 0L
@@ -63,7 +63,6 @@ class LevelScreen : BaseScreen() {
 
         touchToStartLabel = Label("Touch to start!", BaseGame.labelStyle)
         touchToStartLabel.setFontScale(.25f)
-        touchToStartLabel.setOrigin(Align.center)
         touchToStartLabel.addAction(Actions.forever(Actions.sequence(
                 Actions.alpha(1f, .5f),
                 Actions.alpha(.5f, .5f)
@@ -130,13 +129,13 @@ class LevelScreen : BaseScreen() {
         else if (keycode == Keys.ENTER && gameOver) {
             gameOver = false
             pause = false
+            playerMayShoot = true
             renderOverlay()
         }
-        else if (keycode == Keys.BACK && gameOver)
+        else if ((keycode == Keys.BACK || keycode == Keys.ESCAPE) && gameOver)
             Gdx.app.exit()
-        else if (keycode == Keys.BACK)
+        else if (keycode == Keys.BACK || keycode == Keys.ESCAPE)
             setGameOver()
-
         return false
     }
 
@@ -146,6 +145,7 @@ class LevelScreen : BaseScreen() {
         if (gameOver) {
             gameOver = false
             pause = false
+            playerMayShoot = true
             renderOverlay()
         }
         return false
