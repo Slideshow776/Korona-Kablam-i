@@ -46,7 +46,7 @@ class LevelScreen : BaseScreen() {
 
         BaseActor.setWorldBounds(width, height)
         player = Player(0f, 0f, mainStage)
-        player.setPosition(Gdx.graphics.width / 2f - player.width / 2f, Gdx.graphics.height * .025f)
+        player.setPosition(Gdx.graphics.width / 2f - player.width / 2f, Gdx.graphics.height * .03f)
         player.isVisible = false
 
         scoreLabel = Label("Score: $score", BaseGame.labelStyle)

@@ -25,7 +25,7 @@ class Enemy(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
         tentacles.centerAtPosition(width / 2, height / 2)
 
         val body = BaseActor(x, y, s)
-        body.loadImage(BaseGame.textureAtlas!!.findRegion("enemy2a"))
+        body.loadImage(BaseGame.textureAtlas!!.findRegion("enemy1a"))
         body.width = width
         body.height = height
         addActor(body)
