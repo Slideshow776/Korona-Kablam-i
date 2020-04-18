@@ -2,6 +2,9 @@
 
 My very own shoot 'em up game.
 
+![image](https://user-images.githubusercontent.com/4059636/79640670-07d81a00-8193-11ea-9ca0-c2d9ab141588.png)
+
+
 # Game Design Document
 
 1. Overall Vision
