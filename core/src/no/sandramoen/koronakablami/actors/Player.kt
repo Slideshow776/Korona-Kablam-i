@@ -9,7 +9,7 @@ import no.sandramoen.koronakablami.utils.BaseActor
 import no.sandramoen.koronakablami.utils.BaseGame
 
 class Player(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
-    private lateinit var engine: Engine
+    private var engine: Engine
 
     init {
         width = Gdx.graphics.width * .125f
@@ -75,12 +75,12 @@ class Player(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
         accelerateAtAngle(0f)
         addAction(Actions.rotateTo(-5f, 1f))
         engine.addAction(Actions.rotateTo(-22f, .8f))
-        engine.addAction(Actions.moveTo(Gdx.graphics.width * -.02f, engine.y, .8f))
+        engine.addAction(Actions.moveTo(Gdx.graphics.width * -.01f, engine.y, .8f))
     }
 
     private fun moveForward() {
         addAction(Actions.rotateTo(0f, 1f))
         engine.addAction(Actions.rotateTo(0f, .8f))
-        engine.addAction(Actions.moveTo(0f, engine.y, .8f))
+        engine.centerAtPosition(width / 2, 0f)
     }
 }
