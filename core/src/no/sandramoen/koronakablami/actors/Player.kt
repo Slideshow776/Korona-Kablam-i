@@ -20,16 +20,26 @@ class Player(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
         setDeceleration(Gdx.graphics.height / 1f)
         setBoundaryPolygon(8)
 
+        // engine
         engine = Engine(x, y, s)
         addActor(engine)
         engine.centerAtPosition(width / 2, 0f)
 
+        // engine effect
+        val exhaustEffect = ExhaustEffect()
+        exhaustEffect.setPosition(width / 2, Gdx.graphics.height * .02f)
+        exhaustEffect.setScale(Gdx.graphics.height * .00025f)
+        addActor(exhaustEffect)
+        exhaustEffect.start()
+
+        // spaceship body
         val spaceship = BaseActor(x, y, s)
         spaceship.loadImage(BaseGame.textureAtlas!!.findRegion("player1a"))
         spaceship.width = width
         spaceship.height = height
         addActor(spaceship)
         spaceship.centerAtPosition(width / 2, height / 2)
+
     }
 
     override fun act(dt: Float) {
