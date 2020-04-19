@@ -2,7 +2,6 @@ package no.sandramoen.koronakablami.actors
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
-import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.Array
 import no.sandramoen.koronakablami.utils.BaseActor
@@ -10,9 +9,6 @@ import no.sandramoen.koronakablami.utils.BaseGame
 
 class Enemy(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
     init {
-        /*val images: Array<TextureAtlas.AtlasRegion> = Array()
-        images.add(BaseGame.textureAtlas!!.findRegion("enemy"))
-        loadAnimation(images, .5f, true)*/
         width = Gdx.graphics.width * .3f
         height = Gdx.graphics.height * .25f * (Gdx.graphics.width.toFloat() / Gdx.graphics.height.toFloat())
 
@@ -25,7 +21,12 @@ class Enemy(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
         tentacles.centerAtPosition(width / 2, height / 2)
 
         val body = BaseActor(x, y, s)
-        body.loadImage(BaseGame.textureAtlas!!.findRegion("enemy1a"))
+        val bodyImages: Array<TextureAtlas.AtlasRegion> = Array()
+        for (i in 0 until 18) // average human blinking rate is 15-20 times per minute
+            bodyImages.add(BaseGame.textureAtlas!!.findRegion("enemy1a"))
+        bodyImages.add(BaseGame.textureAtlas!!.findRegion("enemy2a"))
+        body.loadAnimation(bodyImages, .25f, true)
+        //body.loadImage(BaseGame.textureAtlas!!.findRegion("enemy1a"))
         body.width = width
         body.height = height
         addActor(body)
