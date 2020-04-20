@@ -91,6 +91,7 @@ class Player(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
     private fun moveForward() {
         addAction(Actions.rotateTo(0f, 1f))
         engine.addAction(Actions.rotateTo(0f, .8f))
-        engine.centerAtPosition(width / 2, 0f)
+        /*engine.centerAtPosition(width / 2, 0f)*/
+        engine.addAction(Actions.moveTo(width / 2 - engine.width / 2, engine.y, .8f))
     }
 }
