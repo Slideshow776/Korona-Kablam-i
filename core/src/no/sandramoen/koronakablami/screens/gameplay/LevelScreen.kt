@@ -9,9 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Container
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
-import no.sandramoen.koronakablami.actors.Enemy
-import no.sandramoen.koronakablami.actors.Laser
-import no.sandramoen.koronakablami.actors.Player
+import no.sandramoen.koronakablami.actors.*
 import no.sandramoen.koronakablami.utils.BaseActor
 import no.sandramoen.koronakablami.utils.BaseGame
 import no.sandramoen.koronakablami.utils.BaseScreen
@@ -43,6 +41,17 @@ class LevelScreen : BaseScreen() {
         width = Gdx.graphics.width.toFloat()
         height = Gdx.graphics.height.toFloat()
         // ratio = width / height
+
+        Parallax(0f, 0f, mainStage, "background4", height * .032f)
+        Parallax(0f, height, mainStage, "background4", height * .032f)
+        Parallax(0f, 0f, mainStage, "background3", height * .049f)
+        Parallax(0f, height, mainStage, "background3", height * .049f)
+        Parallax(0f, 0f, mainStage, "background2", height * .066f)
+        Parallax(0f, height, mainStage, "background2", height * .066f)
+        Parallax(0f, 0f, mainStage, "background1", height * .083f)
+        Parallax(0f, height, mainStage, "background1", height * .083f)
+        Parallax(0f, 0f, mainStage, "background0", height * .1f)
+        Parallax(0f, height, mainStage, "background0", height * .1f)
 
         BaseActor.setWorldBounds(width, height)
         player = Player(0f, 0f, mainStage)
@@ -121,6 +130,7 @@ class LevelScreen : BaseScreen() {
                 }
             }
         }
+
     }
 
     override fun keyDown(keycode: Int): Boolean { // desktop controls

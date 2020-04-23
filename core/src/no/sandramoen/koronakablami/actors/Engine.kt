@@ -27,13 +27,12 @@ class Engine(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
     }
 
     override fun draw(batch: Batch, parentAlpha: Float) {
-
-
+        batch.shader = shaderProgram
         shaderProgram.setUniformf("u_time", time)
         shaderProgram.setUniformf("u_imageSize", Vector2(width, height))
-        shaderProgram.setUniformf("u_amplitude", Vector2(.35f, 3f))
-        shaderProgram.setUniformf("u_wavelength", Vector2(80f, 75f))
-        shaderProgram.setUniformf("u_velocity", Vector2(80f, 20f))
+        shaderProgram.setUniformf("u_amplitude", Vector2(.65f, .3f))
+        shaderProgram.setUniformf("u_wavelength", Vector2(80f, 90f))
+        shaderProgram.setUniformf("u_velocity", Vector2(50f, 20f))
         super.draw(batch, parentAlpha)
         batch.shader = null
     }
