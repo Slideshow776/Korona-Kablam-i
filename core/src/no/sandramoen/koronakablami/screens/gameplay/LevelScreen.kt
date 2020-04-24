@@ -53,10 +53,24 @@ class LevelScreen : BaseScreen() {
         Parallax(0f, 0f, mainStage, "background0", height * .1f)
         Parallax(0f, height, mainStage, "background0", height * .1f)
 
+        Parallax(0f, 0f, mainStage, "bloodCellsBackground0", height * .15f)
+        Parallax(0f, height, mainStage, "bloodCellsBackground0", height * .15f)
+        Parallax(0f, 0f, mainStage, "platelets0", height * .12f)
+        Parallax(0f, height, mainStage, "platelets0", height * .12f)
+        Parallax(0f, 0f, mainStage, "whiteBloodCells0", height * .05f)
+        Parallax(0f, height, mainStage, "whiteBloodCells0", height * .05f)
+        Parallax(0f, 0f, mainStage, "bloodCellsBackground1", height * .2f)
+        Parallax(0f, height, mainStage, "bloodCellsBackground1", height * .2f)
+        Parallax(0f, 0f, mainStage, "bloodCellsBackground2", height * .25f)
+        Parallax(0f, height, mainStage, "bloodCellsBackground2", height * .25f)
+
         BaseActor.setWorldBounds(width, height)
         player = Player(0f, 0f, mainStage)
         player.setPosition(Gdx.graphics.width / 2f - player.width / 2f, Gdx.graphics.height * .03f)
         player.isVisible = false
+
+        Parallax(0f, 0f, mainStage, "bloodCellsBackground3", height * .1f)
+        Parallax(0f, height, mainStage, "bloodCellsBackground3", height * .1f)
 
         scoreLabel = Label("Score: $score", BaseGame.labelStyle)
         scoreLabel.setFontScale(.5f)
