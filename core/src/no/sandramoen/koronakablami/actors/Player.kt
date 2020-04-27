@@ -34,7 +34,7 @@ class Player(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
 
         // spaceship body
         val spaceship = BaseActor(x, y, s)
-        spaceship.loadImage(BaseGame.textureAtlas!!.findRegion("player1a"))
+        spaceship.loadImage("player1a")
         spaceship.width = width
         spaceship.height = height
         addActor(spaceship)

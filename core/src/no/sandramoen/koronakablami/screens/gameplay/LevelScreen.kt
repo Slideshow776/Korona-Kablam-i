@@ -136,7 +136,8 @@ class LevelScreen : BaseScreen() {
             }
             for (laser: BaseActor in BaseActor.getList(mainStage, Laser::class.java.canonicalName)) {
                 if (enemy.overlaps(laser)) {
-                    enemy.remove()
+                    val temp = enemy as Enemy
+                    temp.die()
                     laser.remove()
                     score += 100
                     scoreLabel.setText("Score: $score")

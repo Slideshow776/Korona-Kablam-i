@@ -25,6 +25,7 @@ open class BaseActor(x: Float, y: Float, s: Stage) : Group() {
     private var deceleration: Float = 0f
 
     private var boundaryPolygon: Polygon? = null
+    var disableCollision = false
 
     init {
         this.x = x
@@ -80,7 +81,6 @@ open class BaseActor(x: Float, y: Float, s: Stage) : Group() {
             anim.playMode = Animation.PlayMode.NORMAL
     }
 
-    // Graphics ---------------------------------------------------------------------------------------------------
     fun setAnimationPaused(pause: Boolean) {
         animationPaused = pause
     }
@@ -142,7 +142,8 @@ open class BaseActor(x: Float, y: Float, s: Stage) : Group() {
         return anim
     }
 
-    fun loadImage(region: TextureAtlas.AtlasRegion) {
+    fun loadImage(name: String) {
+        val region = BaseGame.textureAtlas!!.findRegion(name)
         setAnimation(Animation(1f, region), false)
     }
 
@@ -227,6 +228,7 @@ open class BaseActor(x: Float, y: Float, s: Stage) : Group() {
     }
 
     fun overlaps(other: BaseActor): Boolean {
+        if (disableCollision) return false
         val poly1: Polygon = this.getBoundaryPolygon()
         val poly2: Polygon = other.getBoundaryPolygon()
 

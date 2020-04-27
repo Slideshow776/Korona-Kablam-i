@@ -3,14 +3,13 @@ package no.sandramoen.koronakablami.actors
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.Stage
 import no.sandramoen.koronakablami.utils.BaseActor
-import no.sandramoen.koronakablami.utils.BaseGame
 
 /*
 * Assumes all parallax background images fill the whole screen, and moves from top to bottom
 * */
 class Parallax(x: Float, y: Float, s: Stage, texture: String, speed: Float): BaseActor(x, y, s) {
     init {
-        loadImage(BaseGame.textureAtlas!!.findRegion(texture))
+        loadImage(texture)
         width = Gdx.graphics.width.toFloat()
         height = Gdx.graphics.height.toFloat()
         setSpeed(speed)

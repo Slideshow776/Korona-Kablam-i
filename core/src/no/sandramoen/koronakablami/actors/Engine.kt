@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.Stage
 import no.sandramoen.koronakablami.utils.BaseActor
-import no.sandramoen.koronakablami.utils.BaseGame
 
 class Engine(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
     private var vertexShaderCode: String
@@ -15,7 +14,7 @@ class Engine(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
     var time = .0f
 
     init {
-        loadImage(BaseGame.textureAtlas!!.findRegion("player1b"))
+        loadImage("player1b")
         width = Gdx.graphics.width * .11f
         height = Gdx.graphics.height * .11f * (Gdx.graphics.width.toFloat() / Gdx.graphics.height.toFloat())
 
