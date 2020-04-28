@@ -54,6 +54,8 @@ class Enemy(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
 
         val a = BaseActor(x - width / 2, y, stage)
         a.loadImage("enemy3a")
+        a.width = width
+        a.height = height
         a.centerAtPosition(width / 4, height / 2)
         addActor(a)
         a.addAction(Actions.parallel(
@@ -68,6 +70,8 @@ class Enemy(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
 
         val b = BaseActor(x + width / 2, y, stage)
         b.loadImage("enemy3b")
+        b.width = width
+        b.height = height
         b.centerAtPosition(width / 4, height / 2)
         addActor(b)
         b.addAction(Actions.parallel(

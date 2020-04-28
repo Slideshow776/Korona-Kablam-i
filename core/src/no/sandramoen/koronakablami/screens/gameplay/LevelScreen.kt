@@ -5,10 +5,8 @@ import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
-import com.badlogic.gdx.scenes.scene2d.ui.Container
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
-import com.badlogic.gdx.utils.Align
 import no.sandramoen.koronakablami.actors.*
 import no.sandramoen.koronakablami.utils.BaseActor
 import no.sandramoen.koronakablami.utils.BaseGame
@@ -132,11 +130,15 @@ class LevelScreen : BaseScreen() {
 
         for (enemy: BaseActor in BaseActor.getList(mainStage, Enemy::class.java.canonicalName)) {
             if (player.overlaps(enemy)) {
+                val explosion = Explosions(0f, 0f, mainStage)
+                explosion.centerAtPosition(player.x + player.width + width * .04f, player.y + player.height / 2)
                 setGameOver()
             }
             for (laser: BaseActor in BaseActor.getList(mainStage, Laser::class.java.canonicalName)) {
                 if (enemy.overlaps(laser)) {
                     val temp = enemy as Enemy
+                    val explosion = Explosions(0f, 0f, mainStage)
+                    explosion.centerAtActor(temp)
                     temp.die()
                     laser.remove()
                     score += 100
@@ -156,8 +158,7 @@ class LevelScreen : BaseScreen() {
             pause = false
             playerMayShoot = true
             renderOverlay()
-        }
-        else if ((keycode == Keys.BACK || keycode == Keys.ESCAPE) && gameOver)
+        } else if ((keycode == Keys.BACK || keycode == Keys.ESCAPE) && gameOver)
             Gdx.app.exit()
         else if (keycode == Keys.BACK || keycode == Keys.ESCAPE)
             setGameOver()
