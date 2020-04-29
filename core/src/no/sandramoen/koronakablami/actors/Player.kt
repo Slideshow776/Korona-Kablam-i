@@ -69,6 +69,7 @@ class Player(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
     }
 
     fun shoot() {
+        BaseGame.laserShotSound!!.play(BaseGame.audioVolume)
         val laser = Laser(0f, 0f, this.stage)
         laser.centerAtActor(this)
         laser.setPosition(laser.x, laser.y + height / 2)

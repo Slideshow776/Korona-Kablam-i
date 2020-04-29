@@ -44,6 +44,10 @@ abstract class BaseGame : Game(), AssetErrorListener {
         // game state
         var prefs: Preferences? = null
         var highScore: Long = 0
+        var levelMusic: Music? = null
+        var laserShotSound: Sound? = null
+        var explosionsSound: Sound? = null
+        var audioVolume = .25f
 
         fun setActiveScreen(s: BaseScreen) {
             game?.setScreen(s)
@@ -62,6 +66,9 @@ abstract class BaseGame : Game(), AssetErrorListener {
         assetManager.setErrorListener(this)
         // assetManager.load("audio/***.wav", Music::class.java)
         assetManager.load("images/included/packed/koronakablami.pack.atlas", TextureAtlas::class.java)
+        assetManager.load("audio/331876__furbyguy__idunnometloop.wav", Music::class.java)
+        assetManager.load("audio/Laser_Shoot3.wav", Sound::class.java)
+        assetManager.load("audio/Explosion15.wav", Sound::class.java)
         val resolver = InternalFileHandleResolver()
         assetManager.setLoader(FreeTypeFontGenerator::class.java, FreeTypeFontGeneratorLoader(resolver))
         assetManager.setLoader(BitmapFont::class.java, ".ttf", FreetypeFontLoader(resolver))
@@ -74,7 +81,10 @@ abstract class BaseGame : Game(), AssetErrorListener {
         splashAnim = Animation(1f, TextureRegion(splashTexture))
 
         // audio
-        // levelMusic = assetManager.get("audio/***.mp3", Music::class.java)
+        // assetManager.load("audio/", Music::class.java)
+        levelMusic = assetManager.get("audio/331876__furbyguy__idunnometloop.wav", Music::class.java)
+        laserShotSound = assetManager.get("audio/Laser_Shoot3.wav", Sound::class.java)
+        explosionsSound = assetManager.get("audio/Explosion15.wav", Sound::class.java)
 
         // fonts
         FreeTypeFontGenerator.setMaxTextureSize(2048) // solves font bug that won't show some characters like "." and "," in android

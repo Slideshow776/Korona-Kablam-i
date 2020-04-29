@@ -40,6 +40,10 @@ class LevelScreen : BaseScreen() {
         height = Gdx.graphics.height.toFloat()
         // ratio = width / height
 
+        BaseGame.levelMusic!!.isLooping = true
+        BaseGame.levelMusic!!.volume = BaseGame.audioVolume
+        BaseGame.levelMusic!!.play()
+
         Parallax(0f, 0f, mainStage, "background4", height * .032f)
         Parallax(0f, height, mainStage, "background4", height * .032f)
         Parallax(0f, 0f, mainStage, "background3", height * .049f)
@@ -130,12 +134,14 @@ class LevelScreen : BaseScreen() {
 
         for (enemy: BaseActor in BaseActor.getList(mainStage, Enemy::class.java.canonicalName)) {
             if (player.overlaps(enemy)) {
+                BaseGame.explosionsSound!!.play(BaseGame.audioVolume)
                 val explosion = Explosions(0f, 0f, mainStage)
                 explosion.centerAtPosition(player.x + player.width + width * .04f, player.y + player.height / 2)
                 setGameOver()
             }
             for (laser: BaseActor in BaseActor.getList(mainStage, Laser::class.java.canonicalName)) {
                 if (enemy.overlaps(laser)) {
+                    BaseGame.explosionsSound!!.play(BaseGame.audioVolume)
                     val temp = enemy as Enemy
                     val explosion = Explosions(0f, 0f, mainStage)
                     explosion.centerAtActor(temp)
