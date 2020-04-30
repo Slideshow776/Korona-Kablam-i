@@ -32,6 +32,7 @@ class LevelScreen : BaseScreen() {
 
     private lateinit var scoreLabel: Label
     private lateinit var overlayScoreLabel: Label
+    private lateinit var title: BaseActor
     private lateinit var highScoreLabel: Label
     private lateinit var touchToStartLabel: Label
 
@@ -78,9 +79,14 @@ class LevelScreen : BaseScreen() {
         scoreLabel.setFontScale(.5f)
         scoreLabel.isVisible = false
 
+        title = BaseActor(0f, 0f, uiStage)
+        title.loadImage("title")
+        title.width = width * .98f
+        title.height = Gdx.graphics.height * .20f * (width / height)
+
         highScoreLabel = Label("High Score: ${BaseGame.highScore}", BaseGame.labelStyle)
         highScoreLabel.setFontScale(.55f)
-        highScoreLabel.color = Color.YELLOW
+        highScoreLabel.color = Color.ORANGE
 
         overlayScoreLabel = Label("Score: $score", BaseGame.labelStyle)
         overlayScoreLabel.setFontScale(.45f)
@@ -97,6 +103,7 @@ class LevelScreen : BaseScreen() {
         uiTable.setFillParent(true)
 
         uiTable.add(scoreLabel).expandY().top().padTop(height * .01f).row()
+        uiTable.add(title).row()
         uiTable.add(highScoreLabel).row()
         uiTable.add(overlayScoreLabel).row()
         uiTable.add(touchToStartLabel).padBottom(height * .15f).row()
@@ -185,6 +192,7 @@ class LevelScreen : BaseScreen() {
 
     private fun renderOverlay() {
         scoreLabel.isVisible = !scoreLabel.isVisible
+        title.isVisible = !title.isVisible
         highScoreLabel.isVisible = !scoreLabel.isVisible
         overlayScoreLabel.isVisible = !scoreLabel.isVisible
         touchToStartLabel.isVisible = !scoreLabel.isVisible
@@ -204,7 +212,7 @@ class LevelScreen : BaseScreen() {
             overlayScoreLabel.color = Color.WHITE
             scoreLabel.addAction(Actions.color(Color.WHITE, 1f))
             highScoreLabel.setText("High Score: ${BaseGame.highScore}")
-            highScoreLabel.color = Color.YELLOW
+            highScoreLabel.color = Color.ORANGE
             touchToStartLabel.setText("Touch to restart!")
         }
     }
