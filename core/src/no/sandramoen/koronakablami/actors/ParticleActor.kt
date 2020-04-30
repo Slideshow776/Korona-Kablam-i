@@ -18,8 +18,7 @@ open class ParticleActor(pfxFile: String, imageDirectory: String) : Group() {
     }
 
     init {
-        effect.load(Gdx.files.internal(pfxFile), Gdx.files.internal(imageDirectory))
-        // effect.load(Gdx.files.internal(pfxFile), BaseGame.textureAtlas!!)
+        effect.load(Gdx.files.internal(pfxFile), BaseGame.textureAtlas!!)
         renderingActor = ParticleRenderer(effect)
         this.addActor(renderingActor)
     }

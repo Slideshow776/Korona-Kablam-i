@@ -14,6 +14,13 @@ class Explosions(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
         width = Gdx.graphics.width * .3f
         height = Gdx.graphics.height * .25f * (Gdx.graphics.width.toFloat() / Gdx.graphics.height.toFloat())
 
+        // explosions effect
+        val effect = ExplosionsEffect()
+        effect.setPosition(width / 4, height / 3) // by trial and error...
+        effect.setScale(Gdx.graphics.height * .00025f)
+        this.addActor(effect)
+        effect.start()
+
         for (i in 4..20)
             createRandomExplosion(s)
 

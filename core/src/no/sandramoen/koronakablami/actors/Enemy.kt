@@ -50,9 +50,9 @@ class Enemy(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
         tentacles.remove()
         setSpeed(0f)
         disableCollision = true
-        val animationDuration = 1f
 
-        val a = BaseActor(x - width / 2, y, stage)
+        val animationDuration = 1f
+        val a = BaseActor(x - width / 2, y, stage) // left half
         a.loadImage("enemy3a")
         a.width = width
         a.height = height
@@ -63,12 +63,12 @@ class Enemy(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
                 Actions.rotateBy(MathUtils.random(-360f, 360f), animationDuration),
                 Actions.fadeOut(animationDuration),
                 Actions.sequence(
-                        Actions.delay(animationDuration),
+                        Actions.delay(animationDuration * 2),
                         Actions.run { flagRemove = true }
                 )
         ))
 
-        val b = BaseActor(x + width / 2, y, stage)
+        val b = BaseActor(x + width / 2, y, stage) // right half
         b.loadImage("enemy3b")
         b.width = width
         b.height = height
@@ -79,5 +79,12 @@ class Enemy(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
                 Actions.rotateBy(MathUtils.random(0f, 90f), animationDuration),
                 Actions.fadeOut(animationDuration)
         ))
+
+        // blood effect
+        val effect = BloodEffect()
+        effect.setPosition(width / 4, height / 3) // by trial and error...
+        effect.setScale(Gdx.graphics.height * .00025f)
+        this.addActor(effect)
+        effect.start()
     }
 }
