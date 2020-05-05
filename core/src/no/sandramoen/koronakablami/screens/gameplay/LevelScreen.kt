@@ -29,6 +29,7 @@ class LevelScreen : BaseScreen() {
     private var titleAnimationPlaying = true
     private var score = 0L
     private var playNewHighScoreSoundOnce = true
+    private var laserHits: Int = 0
 
     private var enemyTimer = 0f
     private var enemySpeed = 100f
@@ -36,6 +37,7 @@ class LevelScreen : BaseScreen() {
 
     private lateinit var scoreLabel: Label
     private lateinit var overlayScoreLabel: Label
+    private lateinit var motivationLabel: Label
     private lateinit var title0: BaseActor
     private lateinit var title1: BaseActor
     private lateinit var title2: BaseActor
@@ -86,6 +88,10 @@ class LevelScreen : BaseScreen() {
         scoreLabel.setFontScale(.5f)
         scoreLabel.isVisible = false
 
+        motivationLabel = Label("", BaseGame.labelStyle)
+        motivationLabel.setFontScale(.7f)
+        motivationLabel.color = Color(29f / 255, 86f / 255, 172f / 255, 1f)
+
         title0 = createTitleFragment("title0", .39f)
         title1 = createTitleFragment("title1", .14f)
         val titleStack = Stack()
@@ -118,6 +124,7 @@ class LevelScreen : BaseScreen() {
         uiTable.setFillParent(true)
 
         uiTable.add(scoreLabel).expandY().top().padTop(height * .01f).colspan(4).row()
+        uiTable.add(motivationLabel).padTop(height * .01f).colspan(4).row()
         uiTable.add(title0)
         uiTable.add(title1)
         uiTable.add(title2)
@@ -158,6 +165,8 @@ class LevelScreen : BaseScreen() {
             return
 
         playerMayShoot = BaseActor.count(mainStage, Laser::class.java.canonicalName) <= 2
+        if (BaseGame.miss)
+            laserHits = 0
 
         for (enemy: BaseActor in BaseActor.getList(mainStage, Enemy::class.java.canonicalName)) {
             if (player.overlaps(enemy)) {
@@ -183,6 +192,9 @@ class LevelScreen : BaseScreen() {
                     tempLabel.setSpeed(tempEnemy.getSpeed())
                     tempEnemy.die()
                     laser.remove()
+                    BaseGame.miss = false
+                    laserHits++
+                    motivate()
                     addToScore(100)
                     scoreLabel.setText("Score: $score")
                     checkHighScore()
@@ -268,6 +280,7 @@ class LevelScreen : BaseScreen() {
         playerMayShoot = false
         player.isVisible = false
         playNewHighScoreSoundOnce = true
+        laserHits = 0
         GameUtils.saveGameState()
         renderOverlay()
     }
@@ -340,5 +353,42 @@ class LevelScreen : BaseScreen() {
     private fun addToScore(score: Int) {
         this.score += score
         scoreLabel.setText("Score: ${this.score}")
+    }
+
+    private fun motivate() {
+        var motivation = ""
+        when (laserHits) {
+            3 -> motivation = "Nice!"
+            6 -> motivation = "Cool!"
+            9 -> motivation = "Wow!"
+            12 -> motivation = "No way!"
+            18 -> motivation = "Fierce!"
+            24 -> motivation = "Awesome!"
+            30 -> motivation = "Sayonara!"
+            40 -> motivation = "All out of gum!"
+            50 -> motivation = "Piece of cake!"
+            60 -> motivation = "Yippee Ki Yay!"
+            70 -> motivation = "Dodge this"
+            80 -> motivation = "Astounding!"
+            90 -> motivation = "Staggering!"
+            100 -> motivation = "You shall not pass!"
+            110 -> motivation = "Extraordinary!"
+            120 -> motivation = "Resistance is futile!"
+            130 -> motivation = "Assimilate this!"
+            140 -> motivation = "Unbelievable!"
+            150 -> motivation = "Breathtaking!"
+            160 -> motivation = "Epic!"
+            170 -> motivation = "Legendary!"
+        }
+
+        if (motivationLabel.actions.size == 0 && !motivationLabel.textEquals(motivation)) {
+            motivationLabel.setText(motivation)
+            motivationLabel.color.a = 0f
+            motivationLabel.addAction(Actions.sequence(
+                    Actions.fadeIn(.3f),
+                    Actions.delay(.4f),
+                    Actions.fadeOut(.3f)
+            ))
+        }
     }
 }

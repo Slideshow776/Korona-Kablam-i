@@ -50,6 +50,7 @@ abstract class BaseGame : Game(), AssetErrorListener {
         var pickupSound: Sound? = null
         var newHighScoreSound: Sound? = null
         var audioVolume = .25f
+        var miss = false
 
         fun setActiveScreen(s: BaseScreen) {
             game?.setScreen(s)

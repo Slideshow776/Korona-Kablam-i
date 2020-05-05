@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import no.sandramoen.koronakablami.utils.BaseActor
+import no.sandramoen.koronakablami.utils.BaseGame
 
 class Laser(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
     init {
@@ -13,7 +14,12 @@ class Laser(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
 
         addAction(Actions.delay(.6f))
         addAction(Actions.after(Actions.fadeOut(.25f)))
-        addAction(Actions.after(Actions.removeActor()))
+        addAction(Actions.after(Actions.sequence(
+                Actions.run { BaseGame.miss = true },
+                Actions.removeActor()))
+        )
+
+
 
         setSpeed(Gdx.graphics.height / 1f) // pixels / seconds
         setMaxSpeed(Gdx.graphics.height / 1f)
