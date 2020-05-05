@@ -9,7 +9,6 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Stack
 import com.badlogic.gdx.scenes.scene2d.ui.Table
-import com.badlogic.gdx.utils.Align
 import no.sandramoen.koronakablami.actors.*
 import no.sandramoen.koronakablami.utils.BaseActor
 import no.sandramoen.koronakablami.utils.BaseGame
@@ -172,15 +171,27 @@ class LevelScreen : BaseScreen() {
                     val temp = enemy as Enemy
                     val explosion = Explosions(0f, 0f, mainStage)
                     explosion.centerAtActor(temp)
+                    if (MathUtils.random(1, 15) == 1) { // TODO: correct the probability here
+                        val rna = RNA(0f, 0f, mainStage)
+                        rna.centerAtActor(temp)
+                        rna.setSpeed(temp.getSpeed())
+                    }
                     temp.die()
                     laser.remove()
-                    score += 100
+                    addToScore(100)
                     scoreLabel.setText("Score: $score")
-                    checkAndSaveHighScore()
+                    checkHighScore()
                 }
             }
         }
 
+        for (rna: BaseActor in BaseActor.getList(mainStage, RNA::class.java.canonicalName)) {
+            if (player.overlaps(rna)) {
+                addToScore(200)
+                BaseGame.pickupSound!!.play(BaseGame.audioVolume)
+                rna.remove()
+            }
+        }
     }
 
     override fun keyDown(keycode: Int): Boolean { // desktop controls
@@ -247,13 +258,13 @@ class LevelScreen : BaseScreen() {
         gameOver = true
         playerMayShoot = false
         player.isVisible = false
+        GameUtils.saveGameState()
         renderOverlay()
     }
 
-    private fun checkAndSaveHighScore() {
+    private fun checkHighScore() {
         if (score > BaseGame.highScore) {
             BaseGame.highScore = score
-            GameUtils.saveGameState()
             overlayScoreLabel.color = Color.RED
             scoreLabel.addAction(Actions.color(Color.RED, 1f))
             highScoreLabel.setText("New High Score: ${BaseGame.highScore}")
@@ -298,7 +309,7 @@ class LevelScreen : BaseScreen() {
                 )
         ))
         title2.addAction(Actions.sequence( // "BLAM"
-                Actions.delay(1.575f * animationSpeed),
+                Actions.delay(1.575f + .25f * animationSpeed),
                 Actions.sizeTo(title2.width * 1.2f, title2.width * 1.2f, .2f * animationSpeed, Interpolation.swingOut),
                 Actions.run { // "i!"
                     title3.isAnimated = true
@@ -311,5 +322,10 @@ class LevelScreen : BaseScreen() {
                     touchToStartLabel.isVisible = true
                 }
         ))
+    }
+
+    private fun addToScore(score: Int) {
+        this.score += score
+        scoreLabel.setText("Score: ${this.score}")
     }
 }

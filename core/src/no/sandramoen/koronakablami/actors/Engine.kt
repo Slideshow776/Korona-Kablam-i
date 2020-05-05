@@ -22,18 +22,22 @@ class Engine(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
         fragmenterShaderCode = Gdx.files.internal("shaders/wave.fs").readString()
         shaderProgram = ShaderProgram(vertexShaderCode, fragmenterShaderCode)
         if (!shaderProgram.isCompiled)
-            Gdx.app.error("WaveBackground.kt", "Shader compile error: " + shaderProgram.log)
+            Gdx.app.error("Engine.kt", "Shader compile error: " + shaderProgram.log)
     }
 
     override fun draw(batch: Batch, parentAlpha: Float) {
-        batch.shader = shaderProgram
-        shaderProgram.setUniformf("u_time", time)
-        shaderProgram.setUniformf("u_imageSize", Vector2(width, height))
-        shaderProgram.setUniformf("u_amplitude", Vector2(.65f, .3f))
-        shaderProgram.setUniformf("u_wavelength", Vector2(80f, 90f))
-        shaderProgram.setUniformf("u_velocity", Vector2(50f, 20f))
-        super.draw(batch, parentAlpha)
-        batch.shader = null
+        try {
+            batch.shader = shaderProgram
+            shaderProgram.setUniformf("u_time", time)
+            shaderProgram.setUniformf("u_imageSize", Vector2(width, height))
+            shaderProgram.setUniformf("u_amplitude", Vector2(.65f, .3f))
+            shaderProgram.setUniformf("u_wavelength", Vector2(80f, 90f))
+            shaderProgram.setUniformf("u_velocity", Vector2(50f, 20f))
+            super.draw(batch, parentAlpha)
+            batch.shader = null
+        } catch (error: Error) {
+            super.draw(batch, parentAlpha)
+        }
     }
 
     override fun act(dt: Float) {

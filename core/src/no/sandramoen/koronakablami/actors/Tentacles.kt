@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.Stage
 import no.sandramoen.koronakablami.utils.BaseActor
+import java.lang.Error
 
 class Tentacles(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
     private var vertexShaderCode: String
@@ -26,14 +27,18 @@ class Tentacles(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
     }
 
     override fun draw(batch: Batch, parentAlpha: Float) {
-        batch.shader = shaderProgram
-        shaderProgram.setUniformf("u_time", time)
-        shaderProgram.setUniformf("u_imageSize", Vector2(width, height))
-        shaderProgram.setUniformf("u_amplitude", Vector2(.6f, 1.5f))
-        shaderProgram.setUniformf("u_wavelength", Vector2(250f, 250f))
-        shaderProgram.setUniformf("u_velocity", Vector2(75f, 75f))
-        super.draw(batch, parentAlpha)
-        batch.shader = null
+        try {
+            batch.shader = shaderProgram
+            shaderProgram.setUniformf("u_time", time)
+            shaderProgram.setUniformf("u_imageSize", Vector2(width, height))
+            shaderProgram.setUniformf("u_amplitude", Vector2(.6f, 1.5f))
+            shaderProgram.setUniformf("u_wavelength", Vector2(250f, 250f))
+            shaderProgram.setUniformf("u_velocity", Vector2(75f, 75f))
+            super.draw(batch, parentAlpha)
+            batch.shader = null
+        } catch (error: Error) {
+            super.draw(batch, parentAlpha)
+        }
     }
 
     override fun act(dt: Float) {
