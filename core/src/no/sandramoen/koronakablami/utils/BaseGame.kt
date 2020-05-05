@@ -49,8 +49,10 @@ abstract class BaseGame : Game(), AssetErrorListener {
         var explosionsSound: Sound? = null
         var pickupSound: Sound? = null
         var newHighScoreSound: Sound? = null
+        var screamSound: Sound? = null
         var audioVolume = .25f
         var miss = false
+        var gameOver = true
 
         fun setActiveScreen(s: BaseScreen) {
             game?.setScreen(s)
@@ -74,6 +76,7 @@ abstract class BaseGame : Game(), AssetErrorListener {
         assetManager.load("audio/Explosion15.wav", Sound::class.java)
         assetManager.load("audio/Pickup_Coin8.wav", Sound::class.java)
         assetManager.load("audio/Powerup12.wav", Sound::class.java)
+        assetManager.load("audio/Explosion20.wav", Sound::class.java)
         val resolver = InternalFileHandleResolver()
         assetManager.setLoader(FreeTypeFontGenerator::class.java, FreeTypeFontGeneratorLoader(resolver))
         assetManager.setLoader(BitmapFont::class.java, ".ttf", FreetypeFontLoader(resolver))
@@ -92,6 +95,7 @@ abstract class BaseGame : Game(), AssetErrorListener {
         explosionsSound = assetManager.get("audio/Explosion15.wav", Sound::class.java)
         pickupSound = assetManager.get("audio/Pickup_Coin8.wav", Sound::class.java)
         newHighScoreSound = assetManager.get("audio/Powerup12.wav", Sound::class.java)
+        screamSound = assetManager.get("audio/Explosion20.wav", Sound::class.java)
 
         // fonts
         FreeTypeFontGenerator.setMaxTextureSize(2048) // solves font bug that won't show some characters like "." and "," in android

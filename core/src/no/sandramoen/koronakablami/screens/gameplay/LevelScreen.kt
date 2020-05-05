@@ -24,7 +24,6 @@ class LevelScreen : BaseScreen() {
     lateinit var player: Player
 
     private var playerMayShoot = false
-    private var gameOver = true
     private var pause = true
     private var titleAnimationPlaying = true
     private var score = 0L
@@ -161,7 +160,7 @@ class LevelScreen : BaseScreen() {
                 enemySpeed = 400f
         }
 
-        if (gameOver || pause)
+        if (BaseGame.gameOver || pause)
             return
 
         playerMayShoot = BaseActor.count(mainStage, Laser::class.java.canonicalName) <= 2
@@ -218,12 +217,12 @@ class LevelScreen : BaseScreen() {
     override fun keyDown(keycode: Int): Boolean { // desktop controls
         if (keycode == Keys.SPACE && playerMayShoot)
             player.shoot()
-        else if (keycode == Keys.ENTER && gameOver && !titleAnimationPlaying) {
-            gameOver = false
+        else if (keycode == Keys.ENTER && BaseGame.gameOver && !titleAnimationPlaying) {
+            BaseGame.gameOver = false
             pause = false
             playerMayShoot = true
             renderOverlay()
-        } else if ((keycode == Keys.BACK || keycode == Keys.ESCAPE) && gameOver)
+        } else if ((keycode == Keys.BACK || keycode == Keys.ESCAPE) && BaseGame.gameOver)
             Gdx.app.exit()
         else if (keycode == Keys.BACK || keycode == Keys.ESCAPE)
             setGameOver()
@@ -233,8 +232,8 @@ class LevelScreen : BaseScreen() {
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         if (playerMayShoot)
             player.shoot()
-        if (gameOver && !titleAnimationPlaying) {
-            gameOver = false
+        if (BaseGame.gameOver && !titleAnimationPlaying) {
+            BaseGame.gameOver = false
             pause = false
             playerMayShoot = true
             renderOverlay()
@@ -252,7 +251,7 @@ class LevelScreen : BaseScreen() {
         highScoreLabel.isVisible = !scoreLabel.isVisible
         overlayScoreLabel.isVisible = !scoreLabel.isVisible
         touchToStartLabel.isVisible = !scoreLabel.isVisible
-        if (gameOver) { // viewing the menu
+        if (BaseGame.gameOver) { // viewing the menu
             startTitleAnimation()
             overlayScoreLabel.setText("Score: $score")
         } else { // playing
@@ -276,7 +275,7 @@ class LevelScreen : BaseScreen() {
     }
 
     private fun setGameOver() {
-        gameOver = true
+        BaseGame.gameOver = true
         playerMayShoot = false
         player.isVisible = false
         playNewHighScoreSoundOnce = true
