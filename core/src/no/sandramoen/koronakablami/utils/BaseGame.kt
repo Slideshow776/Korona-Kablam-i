@@ -94,9 +94,9 @@ abstract class BaseGame : Game(), AssetErrorListener {
 
         // fonts
         FreeTypeFontGenerator.setMaxTextureSize(2048) // solves font bug that won't show some characters like "." and "," in android
-        val fontGenerator = FreeTypeFontGenerator(Gdx.files.internal("fonts/OpenSans.ttf"))
+        val fontGenerator = FreeTypeFontGenerator(Gdx.files.internal("fonts/arcade.ttf"))
         val fontParameters = FreeTypeFontParameter()
-        fontParameters.size = (.059f * Gdx.graphics.height).toInt() // If the resolutions height is 1440 then the font size becomes 86
+        fontParameters.size = (.038f * Gdx.graphics.height).toInt() // Font size is based on width of screen...
         fontParameters.color = Color.WHITE
         fontParameters.borderWidth = 2f
         fontParameters.borderColor = Color.BLACK

@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Stack
 import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.utils.Align
 import no.sandramoen.koronakablami.actors.*
 import no.sandramoen.koronakablami.utils.BaseActor
 import no.sandramoen.koronakablami.utils.BaseGame
@@ -121,9 +122,9 @@ class LevelScreen : BaseScreen() {
         uiTable.add(title1)
         uiTable.add(title2)
         uiTable.add(titleStack).row()
-        uiTable.add(highScoreLabel).colspan(4).row()
-        uiTable.add(overlayScoreLabel).colspan(4).row()
-        uiTable.add(touchToStartLabel).colspan(4).padTop(height * .01f).padBottom(height * .15f).row()
+        uiTable.add(highScoreLabel).colspan(4).padTop(height * .01f).row()
+        uiTable.add(overlayScoreLabel).colspan(4).padTop(height * .01f).row()
+        uiTable.add(touchToStartLabel).colspan(4).padTop(height * .02f).padBottom(height * .15f).row()
         uiTable.add().expandY()
 
         /*uiTable.debug = true*/
@@ -168,15 +169,19 @@ class LevelScreen : BaseScreen() {
             for (laser: BaseActor in BaseActor.getList(mainStage, Laser::class.java.canonicalName)) {
                 if (enemy.overlaps(laser)) {
                     BaseGame.explosionsSound!!.play(BaseGame.audioVolume)
-                    val temp = enemy as Enemy
+                    val tempEnemy = enemy as Enemy
                     val explosion = Explosions(0f, 0f, mainStage)
-                    explosion.centerAtActor(temp)
-                    if (MathUtils.random(1, 15) == 1) { // TODO: correct the probability here
+                    explosion.centerAtActor(tempEnemy)
+                    if (MathUtils.random(1, 15) == 1) {
                         val rna = RNA(0f, 0f, mainStage)
-                        rna.centerAtActor(temp)
-                        rna.setSpeed(temp.getSpeed())
+                        rna.centerAtActor(tempEnemy)
+                        rna.setSpeed(tempEnemy.getSpeed())
                     }
-                    temp.die()
+                    val tempLabel = ScoreLabel(0f, 0f, mainStage, "+100")
+                    tempLabel.scaleBy(-.6f)
+                    tempLabel.centerAtActor(tempEnemy)
+                    tempLabel.setSpeed(tempEnemy.getSpeed())
+                    tempEnemy.die()
                     laser.remove()
                     addToScore(100)
                     scoreLabel.setText("Score: $score")
@@ -189,6 +194,10 @@ class LevelScreen : BaseScreen() {
             if (player.overlaps(rna)) {
                 addToScore(200)
                 BaseGame.pickupSound!!.play(BaseGame.audioVolume)
+                val tempLabel = ScoreLabel(0f, 0f, mainStage, "+200")
+                tempLabel.scaleBy(-.6f)
+                tempLabel.centerAtActor(rna)
+                tempLabel.setSpeed(rna.getSpeed())
                 rna.remove()
             }
         }
