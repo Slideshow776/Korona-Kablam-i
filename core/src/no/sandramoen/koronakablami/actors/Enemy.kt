@@ -13,6 +13,7 @@ class Enemy(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
     private var body: BaseActor
     private var tentacles: Tentacles
     private var flagRemove = false
+    private var playedScream = false
 
     init {
         width = Gdx.graphics.width * .3f
@@ -41,8 +42,12 @@ class Enemy(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
     override fun act(dt: Float) {
         super.act(dt)
         applyPhysics(dt)
-        if (y < 0f - height || flagRemove)
+
+        if (flagRemove)
             remove()
+
+        if (y < (Gdx.graphics.height * .1f) - height)
+            scream()
     }
 
     fun die() {
@@ -86,5 +91,32 @@ class Enemy(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
         effect.setScale(Gdx.graphics.height * .00025f)
         this.addActor(effect)
         effect.start()
+    }
+
+    private fun scream() {
+        if (!playedScream && !BaseGame.gameOver) {
+            BaseGame.screamSound!!.play(BaseGame.audioVolume)
+            body.loadImage("enemy4a")
+            body.width = width
+            body.height = height
+            body.centerAtPosition(width / 2, height / 2)
+
+            addAction(Actions.sequence(
+                    Actions.moveBy(Gdx.graphics.width * .01f, 0f, .05f),
+                    Actions.moveBy(Gdx.graphics.width * -.02f, 0f, .05f),
+                    Actions.moveBy(Gdx.graphics.width * .02f, 0f, .05f),
+                    Actions.moveBy(Gdx.graphics.width * -.02f, 0f, .05f),
+                    Actions.moveBy(Gdx.graphics.width * .02f, 0f, .05f),
+                    Actions.moveBy(Gdx.graphics.width * -.01f, 0f, .05f),
+                    Actions.delay(2f),
+                    Actions.run { flagRemove = true }
+            ))
+        } else if (actions.size == 0) {
+            addAction(Actions.sequence(
+                    Actions.delay(2f),
+                    Actions.run { flagRemove = true }
+            ))
+        }
+        playedScream = true
     }
 }
