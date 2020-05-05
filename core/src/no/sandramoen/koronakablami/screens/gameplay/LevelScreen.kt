@@ -19,7 +19,6 @@ class LevelScreen : BaseScreen() {
 
     var width = 0f // will be initialized upon initialize()
     var height = 0f // will be initialized upon initialize()
-    // var ratio = 0f // will be initialized upon initialize()
 
     lateinit var player: Player
 
@@ -28,6 +27,7 @@ class LevelScreen : BaseScreen() {
     private var pause = true
     private var titleAnimationPlaying = true
     private var score = 0L
+    private var playNewHighScoreSoundOnce = true
 
     private var enemyTimer = 0f
     private var enemySpeed = 100f
@@ -258,6 +258,7 @@ class LevelScreen : BaseScreen() {
         gameOver = true
         playerMayShoot = false
         player.isVisible = false
+        playNewHighScoreSoundOnce = true
         GameUtils.saveGameState()
         renderOverlay()
     }
@@ -265,8 +266,11 @@ class LevelScreen : BaseScreen() {
     private fun checkHighScore() {
         if (score > BaseGame.highScore) {
             BaseGame.highScore = score
-            overlayScoreLabel.color = Color.RED
-            scoreLabel.addAction(Actions.color(Color.RED, 1f))
+            overlayScoreLabel.color = Color.ORANGE
+            scoreLabel.addAction(Actions.color(Color.ORANGE, 1f))
+            if (playNewHighScoreSoundOnce && score >= 400L)
+                BaseGame.newHighScoreSound!!.play(BaseGame.audioVolume)
+            playNewHighScoreSoundOnce = false
             highScoreLabel.setText("New High Score: ${BaseGame.highScore}")
             highScoreLabel.color = Color.PURPLE
         }

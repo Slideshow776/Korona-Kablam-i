@@ -48,6 +48,7 @@ abstract class BaseGame : Game(), AssetErrorListener {
         var laserShotSound: Sound? = null
         var explosionsSound: Sound? = null
         var pickupSound: Sound? = null
+        var newHighScoreSound: Sound? = null
         var audioVolume = .25f
 
         fun setActiveScreen(s: BaseScreen) {
@@ -71,6 +72,7 @@ abstract class BaseGame : Game(), AssetErrorListener {
         assetManager.load("audio/Laser_Shoot3.wav", Sound::class.java)
         assetManager.load("audio/Explosion15.wav", Sound::class.java)
         assetManager.load("audio/Pickup_Coin8.wav", Sound::class.java)
+        assetManager.load("audio/Powerup12.wav", Sound::class.java)
         val resolver = InternalFileHandleResolver()
         assetManager.setLoader(FreeTypeFontGenerator::class.java, FreeTypeFontGeneratorLoader(resolver))
         assetManager.setLoader(BitmapFont::class.java, ".ttf", FreetypeFontLoader(resolver))
@@ -88,6 +90,7 @@ abstract class BaseGame : Game(), AssetErrorListener {
         laserShotSound = assetManager.get("audio/Laser_Shoot3.wav", Sound::class.java)
         explosionsSound = assetManager.get("audio/Explosion15.wav", Sound::class.java)
         pickupSound = assetManager.get("audio/Pickup_Coin8.wav", Sound::class.java)
+        newHighScoreSound = assetManager.get("audio/Powerup12.wav", Sound::class.java)
 
         // fonts
         FreeTypeFontGenerator.setMaxTextureSize(2048) // solves font bug that won't show some characters like "." and "," in android
@@ -121,14 +124,6 @@ abstract class BaseGame : Game(), AssetErrorListener {
         textButtonStyle!!.up = NinePatchDrawable(buttonPatch)
         textButtonStyle!!.font = buttonCustomFont
         textButtonStyle!!.fontColor = Color.WHITE
-    }
-
-    override fun resume() {
-        super.resume()
-    }
-
-    override fun pause() {
-        super.pause()
     }
 
     override fun dispose() {
