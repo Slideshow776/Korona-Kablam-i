@@ -5,11 +5,11 @@ import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
+import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Stack
 import com.badlogic.gdx.scenes.scene2d.ui.Table
-import com.badlogic.gdx.utils.Align
 import no.sandramoen.koronakablami.actors.*
 import no.sandramoen.koronakablami.utils.BaseActor
 import no.sandramoen.koronakablami.utils.BaseGame
@@ -34,7 +34,10 @@ class LevelScreen : BaseScreen() {
     private var enemySpeed = 100f
     private var enemySpawnInterval = 3f
 
-    private lateinit var scoreLabel: Label
+    private lateinit var scoreLabelA: Label
+    private lateinit var scoreLabelB: Label
+    private lateinit var scoreLabelBGroup: Group
+    private lateinit var scoreTable: Table
     private lateinit var overlayScoreLabel: Label
     private lateinit var motivationLabel: Label
     private lateinit var title0: BaseActor
@@ -83,9 +86,18 @@ class LevelScreen : BaseScreen() {
         Parallax(0f, 0f, mainStage, "bloodCellsBackground3", height * .1f)
         Parallax(0f, height, mainStage, "bloodCellsBackground3", height * .1f)
 
-        scoreLabel = Label("Score: $score", BaseGame.labelStyle)
-        scoreLabel.setFontScale(.5f)
-        scoreLabel.isVisible = false
+        scoreLabelA = Label("Score: ", BaseGame.labelStyle)
+        scoreLabelA.setFontScale(.5f)
+        scoreLabelA.isVisible = false
+        scoreLabelB = Label("$score", BaseGame.labelStyle)
+        scoreLabelB.setFontScale(.5f)
+        scoreLabelB.isVisible = false
+        scoreLabelBGroup = Group()
+        scoreLabelBGroup.addActor(scoreLabelB)
+        scoreLabelBGroup.width = scoreLabelB.width
+        scoreTable = Table()
+        scoreTable.add(scoreLabelA)
+        scoreTable.add(scoreLabelBGroup).padTop(height * .042f)//.padRight(width * .1f)
 
         motivationLabel = Label("", BaseGame.labelStyle)
         motivationLabel.setFontScale(.7f)
@@ -122,7 +134,7 @@ class LevelScreen : BaseScreen() {
         val uiTable = Table()
         uiTable.setFillParent(true)
 
-        uiTable.add(scoreLabel).expandY().top().padTop(height * .01f).colspan(4).row()
+        uiTable.add(scoreTable).expandY().top().padTop(height * .01f).colspan(4).width(width * .95f).row()
         uiTable.add(motivationLabel).padTop(height * .01f).colspan(4).row()
         uiTable.add(title0)
         uiTable.add(title1)
@@ -195,7 +207,7 @@ class LevelScreen : BaseScreen() {
                     laserHits++
                     motivate()
                     addToScore(100)
-                    scoreLabel.setText("Score: $score")
+                    scoreLabelB.setText("$score")
                     checkHighScore()
                 }
             }
@@ -242,21 +254,23 @@ class LevelScreen : BaseScreen() {
     }
 
     private fun renderOverlay() {
-        scoreLabel.isVisible = !scoreLabel.isVisible
+        scoreLabelA.isVisible = !scoreLabelA.isVisible
+        scoreLabelB.isVisible = !scoreLabelB.isVisible
         title0.isVisible = !title0.isVisible
         title1.isVisible = !title1.isVisible
         title2.isVisible = !title2.isVisible
         title3.isVisible = !title3.isVisible
         title4.isVisible = !title4.isVisible
-        highScoreLabel.isVisible = !scoreLabel.isVisible
-        overlayScoreLabel.isVisible = !scoreLabel.isVisible
-        touchToStartLabel.isVisible = !scoreLabel.isVisible
+        highScoreLabel.isVisible = !scoreLabelA.isVisible
+        overlayScoreLabel.isVisible = !scoreLabelA.isVisible
+        touchToStartLabel.isVisible = !scoreLabelA.isVisible
         if (BaseGame.gameOver) { // viewing the menu
             startTitleAnimation()
             overlayScoreLabel.setText("Score: $score")
         } else { // playing
             score = 0
-            scoreLabel.setText("Score: $score")
+            scoreLabelB.setText("$score")
+            centerScoreLabel(false)
             player.isVisible = true
             player.setPosition(Gdx.graphics.width / 2f - player.width / 2f, Gdx.graphics.height * .03f)
 
@@ -267,7 +281,8 @@ class LevelScreen : BaseScreen() {
             enemySpawnInterval = 3f
 
             overlayScoreLabel.color = Color.WHITE
-            scoreLabel.addAction(Actions.color(Color.WHITE, 1f))
+            scoreLabelA.addAction(Actions.color(Color.WHITE, 1f))
+            scoreLabelB.addAction(Actions.color(Color.WHITE, 1f))
             highScoreLabel.setText("High Score: ${BaseGame.highScore}")
             highScoreLabel.color = Color.ORANGE
             touchToStartLabel.setText("Touch to restart!")
@@ -288,7 +303,8 @@ class LevelScreen : BaseScreen() {
         if (score > BaseGame.highScore) {
             BaseGame.highScore = score
             overlayScoreLabel.color = Color.ORANGE
-            scoreLabel.addAction(Actions.color(Color.ORANGE, 1f))
+            scoreLabelA.addAction(Actions.color(Color.ORANGE, 1f))
+            scoreLabelB.addAction(Actions.color(Color.ORANGE, 1f))
             if (playNewHighScoreSoundOnce && score >= 400L)
                 BaseGame.newHighScoreSound!!.play(BaseGame.audioVolume)
             playNewHighScoreSoundOnce = false
@@ -351,7 +367,13 @@ class LevelScreen : BaseScreen() {
 
     private fun addToScore(score: Int) {
         this.score += score
-        scoreLabel.setText("Score: ${this.score}")
+        scoreLabelB.setText("${this.score}")
+        scoreLabelBGroup.addAction(Actions.sequence(
+                Actions.scaleBy(.15f, .15f, .05f),
+                Actions.scaleBy(-.15f, -.15f, .05f)
+        ))
+        if (this.score.toString()[0].toString().toLong() % this.score == 1L) // bugfix: label moves only once per new digit length
+            centerScoreLabel()
     }
 
     private fun motivate() {
@@ -389,5 +411,17 @@ class LevelScreen : BaseScreen() {
                     Actions.fadeOut(.3f)
             ))
         }
+    }
+
+    private fun centerScoreLabel(animated: Boolean = true) {
+        val offset = width * .05f // five percent of total width of screen
+        val scoreWidth = scoreLabelA.width + scoreLabelB.prefWidth + offset
+        val moveA = width / 2 - scoreWidth / 2
+        val moveB = moveA + scoreLabelA.width
+
+        var duration = .5f
+        if (!animated) duration = 0f
+        scoreLabelA.addAction(Actions.moveTo(moveA, scoreLabelA.y, duration, Interpolation.pow5))
+        scoreLabelBGroup.addAction(Actions.moveTo(moveB, scoreLabelB.y, duration, Interpolation.pow5))
     }
 }
