@@ -11,9 +11,9 @@ class GameUtils {
 
         fun saveGameState() {
             try {
-                BaseGame.prefs!!.putLong("highScore", BaseGame.highScore)
+                BaseGame.prefs!!.putFloat("highScore", BaseGame.highScore)
             } catch (error: Error) {
-                BaseGame.prefs!!.putLong("highScore", 999999999999999999L)
+                BaseGame.prefs!!.putFloat("highScore", Float.MAX_VALUE)
             }
             BaseGame.prefs!!.flush()
         }

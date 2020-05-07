@@ -2,7 +2,7 @@
 
 My very own shoot 'em up game.
 
-![image](https://user-images.githubusercontent.com/4059636/79640670-07d81a00-8193-11ea-9ca0-c2d9ab141588.png)
+![screenShot of gameplay](https://user-images.githubusercontent.com/4059636/81300959-b5df3180-9078-11ea-9336-0deb0d60d17e.png)
 
 
 # Game Design Document

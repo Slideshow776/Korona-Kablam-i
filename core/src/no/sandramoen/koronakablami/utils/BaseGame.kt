@@ -43,7 +43,7 @@ abstract class BaseGame : Game(), AssetErrorListener {
 
         // game state
         var prefs: Preferences? = null
-        var highScore: Long = 0
+        var highScore: Float = 0f
         var levelMusic: Music? = null
         var laserShotSound: Sound? = null
         var explosionsSound: Sound? = null
@@ -64,7 +64,7 @@ abstract class BaseGame : Game(), AssetErrorListener {
 
         // global variables
         prefs = Gdx.app.getPreferences("koronakablamiGameState")
-        highScore = prefs!!.getLong("highScore")
+        highScore = prefs!!.getFloat("highScore")
 
         // asset manager
         assetManager = AssetManager()

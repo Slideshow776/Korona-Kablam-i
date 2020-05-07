@@ -15,6 +15,7 @@ import no.sandramoen.koronakablami.utils.BaseActor
 import no.sandramoen.koronakablami.utils.BaseGame
 import no.sandramoen.koronakablami.utils.BaseScreen
 import no.sandramoen.koronakablami.utils.GameUtils
+import kotlin.math.ceil
 
 class LevelScreen : BaseScreen() {
 
@@ -26,7 +27,8 @@ class LevelScreen : BaseScreen() {
     private var playerMayShoot = false
     private var pause = true
     private var titleAnimationPlaying = true
-    private var score = 0L
+    private var score = 0f
+    private var scoreMotivationalMultiplier = 1f
     private var playNewHighScoreSoundOnce = true
     private var laserHits: Int = 0
 
@@ -116,11 +118,11 @@ class LevelScreen : BaseScreen() {
         title2.toFront()
         title2.zIndex = 99
 
-        highScoreLabel = Label("High Score: ${BaseGame.highScore}", BaseGame.labelStyle)
+        highScoreLabel = Label("High Score: ${BaseGame.highScore.toLong()}", BaseGame.labelStyle)
         highScoreLabel.setFontScale(.55f)
         highScoreLabel.color = Color.ORANGE
 
-        overlayScoreLabel = Label("Score: $score", BaseGame.labelStyle)
+        overlayScoreLabel = Label("Score: ${score.toLong()}", BaseGame.labelStyle)
         overlayScoreLabel.setFontScale(.45f)
         overlayScoreLabel.isVisible = false
 
@@ -176,8 +178,10 @@ class LevelScreen : BaseScreen() {
             return
 
         playerMayShoot = BaseActor.count(mainStage, Laser::class.java.canonicalName) <= 2
-        if (BaseGame.miss)
+        if (BaseGame.miss) {
             laserHits = 0
+            scoreMotivationalMultiplier = 1f
+        }
 
         for (enemy: BaseActor in BaseActor.getList(mainStage, Enemy::class.java.canonicalName)) {
             if (player.overlaps(enemy)) {
@@ -197,7 +201,7 @@ class LevelScreen : BaseScreen() {
                         rna.centerAtActor(tempEnemy)
                         rna.setSpeed(tempEnemy.getSpeed())
                     }
-                    val tempLabel = ScoreLabel(0f, 0f, mainStage, "+100")
+                    val tempLabel = ScoreLabel(0f, 0f, mainStage, "+${ceil(100f * scoreMotivationalMultiplier).toLong()}")
                     tempLabel.scaleBy(-.6f)
                     tempLabel.centerAtActor(tempEnemy)
                     tempLabel.setSpeed(tempEnemy.getSpeed())
@@ -205,9 +209,9 @@ class LevelScreen : BaseScreen() {
                     laser.remove()
                     BaseGame.miss = false
                     laserHits++
+                    addToScore(100f)
                     motivate()
-                    addToScore(100)
-                    scoreLabelB.setText("$score")
+                    scoreLabelB.setText("${score.toLong()}")
                     checkHighScore()
                 }
             }
@@ -215,9 +219,9 @@ class LevelScreen : BaseScreen() {
 
         for (rna: BaseActor in BaseActor.getList(mainStage, RNA::class.java.canonicalName)) {
             if (player.overlaps(rna)) {
-                addToScore(200)
+                addToScore(200f)
                 BaseGame.pickupSound!!.play(BaseGame.audioVolume)
-                val tempLabel = ScoreLabel(0f, 0f, mainStage, "+200")
+                val tempLabel = ScoreLabel(0f, 0f, mainStage, "+${ceil(200 * scoreMotivationalMultiplier).toLong()}")
                 tempLabel.scaleBy(-.6f)
                 tempLabel.centerAtActor(rna)
                 tempLabel.setSpeed(rna.getSpeed())
@@ -266,10 +270,10 @@ class LevelScreen : BaseScreen() {
         touchToStartLabel.isVisible = !scoreLabelA.isVisible
         if (BaseGame.gameOver) { // viewing the menu
             startTitleAnimation()
-            overlayScoreLabel.setText("Score: $score")
+            overlayScoreLabel.setText("Score: ${score.toLong()}")
         } else { // playing
-            score = 0
-            scoreLabelB.setText("$score")
+            score = 0f
+            scoreLabelB.setText("${score.toLong()}")
             centerScoreLabel(false)
             player.isVisible = true
             player.setPosition(Gdx.graphics.width / 2f - player.width / 2f, Gdx.graphics.height * .03f)
@@ -283,7 +287,7 @@ class LevelScreen : BaseScreen() {
             overlayScoreLabel.color = Color.WHITE
             scoreLabelA.addAction(Actions.color(Color.WHITE, 1f))
             scoreLabelB.addAction(Actions.color(Color.WHITE, 1f))
-            highScoreLabel.setText("High Score: ${BaseGame.highScore}")
+            highScoreLabel.setText("High Score: ${BaseGame.highScore.toLong()}")
             highScoreLabel.color = Color.ORANGE
             touchToStartLabel.setText("Touch to restart!")
         }
@@ -295,6 +299,7 @@ class LevelScreen : BaseScreen() {
         player.isVisible = false
         playNewHighScoreSoundOnce = true
         laserHits = 0
+        scoreMotivationalMultiplier = 1f
         GameUtils.saveGameState()
         renderOverlay()
     }
@@ -308,7 +313,7 @@ class LevelScreen : BaseScreen() {
             if (playNewHighScoreSoundOnce && score >= 400L)
                 BaseGame.newHighScoreSound!!.play(BaseGame.audioVolume)
             playNewHighScoreSoundOnce = false
-            highScoreLabel.setText("New High Score: ${BaseGame.highScore}")
+            highScoreLabel.setText("New High Score: ${BaseGame.highScore.toLong()}")
             highScoreLabel.color = Color.PURPLE
         }
     }
@@ -365,41 +370,104 @@ class LevelScreen : BaseScreen() {
         ))
     }
 
-    private fun addToScore(score: Int) {
-        this.score += score
-        scoreLabelB.setText("${this.score}")
+    private fun addToScore(score: Float) {
+        this.score += ceil(score * scoreMotivationalMultiplier)
+        scoreLabelB.setText("${this.score.toLong()}")
         scoreLabelBGroup.addAction(Actions.sequence(
                 Actions.scaleBy(.15f, .15f, .05f),
                 Actions.scaleBy(-.15f, -.15f, .05f)
         ))
-        if (this.score.toString()[0].toString().toLong() % this.score == 1L) // bugfix: label moves only once per new digit length
+        if (this.score.toString()[0].toString().toLong() % this.score == 1f) // bugfix: label moves only once per new digit length
             centerScoreLabel()
     }
 
     private fun motivate() {
         var motivation = ""
         when (laserHits) {
-            3 -> motivation = "Nice!"
-            6 -> motivation = "Cool!"
-            9 -> motivation = "Wow!"
-            12 -> motivation = "No way!"
-            18 -> motivation = "Fierce!"
-            24 -> motivation = "Awesome!"
-            30 -> motivation = "Sayonara!"
-            40 -> motivation = "All out of gum!"
-            50 -> motivation = "Piece of cake!"
-            60 -> motivation = "Yippee Ki Yay!"
-            70 -> motivation = "Dodge this"
-            80 -> motivation = "Astounding!"
-            90 -> motivation = "Staggering!"
-            100 -> motivation = "You shall not pass!"
-            110 -> motivation = "Extraordinary!"
-            120 -> motivation = "Resistance is futile!"
-            130 -> motivation = "Assimilate this!"
-            140 -> motivation = "Unbelievable!"
-            150 -> motivation = "Breathtaking!"
-            160 -> motivation = "Epic!"
-            170 -> motivation = "Legendary!"
+            3 -> {
+                motivation = "Nice!"
+                scoreMotivationalMultiplier = 1.05f
+            }
+            6 -> {
+                motivation = "Cool!"
+                scoreMotivationalMultiplier = 1.1f
+            }
+            9 -> {
+                motivation = "Wow!"
+                scoreMotivationalMultiplier = 1.15f
+            }
+            12 -> {
+                motivation = "No way!"
+                scoreMotivationalMultiplier = 1.2f
+            }
+            18 -> {
+                motivation = "Fierce!"
+                scoreMotivationalMultiplier = 1.25f
+            }
+            24 -> {
+                motivation = "Awesome!"
+                scoreMotivationalMultiplier = 1.3f
+            }
+            30 -> {
+                motivation = "Sayonara!"
+                scoreMotivationalMultiplier = 1.35f
+            }
+            40 -> {
+                motivation = "All out of gum!"
+                scoreMotivationalMultiplier = 1.4f
+            }
+            50 -> {
+                motivation = "Piece of cake!"
+                scoreMotivationalMultiplier = 1.45f
+            }
+            60 -> {
+                motivation = "Yippee Ki Yay!"
+                scoreMotivationalMultiplier = 1.5f
+            }
+            70 -> {
+                motivation = "Dodge this"
+                scoreMotivationalMultiplier = 1.55f
+            }
+            80 -> {
+                motivation = "Astounding!"
+                scoreMotivationalMultiplier = 1.6f
+            }
+            90 -> {
+                motivation = "Staggering!"
+                scoreMotivationalMultiplier = 1.65f
+            }
+            100 -> {
+                motivation = "You shall not pass!"
+                scoreMotivationalMultiplier = 1.7f
+            }
+            110 -> {
+                motivation = "Extraordinary!"
+                scoreMotivationalMultiplier = 1.75f
+            }
+            120 -> {
+                motivation = "Resistance is futile!"
+                scoreMotivationalMultiplier = 1.8f
+            }
+            130 -> {
+                motivation = "Assimilate this!"
+                scoreMotivationalMultiplier = 1.85f
+            }
+            140 -> {
+                motivation = "Unbelievable!"
+                scoreMotivationalMultiplier = 1.9f
+            }
+            150 -> {
+                motivation = "Breathtaking!"
+                scoreMotivationalMultiplier = 1.95f
+            }
+            160 -> {
+                motivation = "Epic!"
+                scoreMotivationalMultiplier = 2f
+            }
+            170 -> {
+                motivation = "Legendary!"
+                scoreMotivationalMultiplier = 2.05f
+            }
         }
 
         if (motivationLabel.actions.size == 0 && !motivationLabel.textEquals(motivation)) {
