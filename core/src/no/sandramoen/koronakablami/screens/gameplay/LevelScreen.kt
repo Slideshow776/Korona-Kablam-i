@@ -53,6 +53,7 @@ class LevelScreen : BaseScreen() {
     private lateinit var tiltTutorialLabel: Label
     private var tiltTutorialTimer = 0f
     private var tiltTutorialIsActive = false
+    private var playTitle2Animation = false
 
     override fun initialize() {
         width = Gdx.graphics.width.toFloat()
@@ -165,6 +166,9 @@ class LevelScreen : BaseScreen() {
     }
 
     override fun update(dt: Float) {
+        if (playTitle2Animation)
+            title2Animation()
+
         if (titleAnimationPlaying)
             return
 
@@ -353,25 +357,12 @@ class LevelScreen : BaseScreen() {
                         Actions.sizeTo(title1.width, title1.height * .5f, .1f * animationSpeed),
                         Actions.moveBy(0f, title1.height * .13f, .1f * animationSpeed)
                 ),
+                Actions.run { playTitle2Animation = true },
                 Actions.delay(.5f),
                 Actions.parallel(
                         Actions.sizeTo(title1.width, title1.height, .5f * animationSpeed),
                         Actions.moveBy(0f, title1.height * -.06f, .5f * animationSpeed)
                 )
-        ))
-        title2.addAction(Actions.sequence( // "BLAM"
-                Actions.delay(1.575f + .25f * animationSpeed),
-                Actions.sizeTo(title2.width * 1.2f, title2.width * 1.2f, .2f * animationSpeed, Interpolation.swingOut),
-                Actions.run { // "i!"
-                    title3.isAnimated = true
-                    title3.addAction(Actions.fadeIn(2f * animationSpeed))
-                    title4.addAction(Actions.fadeIn(2f * animationSpeed))
-                },
-                Actions.sizeTo(title2.width, title2.height, .5f * animationSpeed, Interpolation.bounceOut),
-                Actions.run {
-                    titleAnimationPlaying = false
-                    touchToStartLabel.isVisible = true
-                }
         ))
     }
 
@@ -554,5 +545,24 @@ class LevelScreen : BaseScreen() {
             if (enemySpeed > 400f)
                 enemySpeed = 400f
         }
+    }
+
+    private fun title2Animation() {
+        playTitle2Animation = false
+        val animationSpeed = 1.0f // use this to change the total animation speed (bigger is slower, lesser is faster)
+        title2.addAction(Actions.sequence( // "BLAM"
+                // Actions.delay(1.575f + .25f * animationSpeed),
+                Actions.sizeTo(title2.width * 1.2f, title2.width * 1.2f, .2f * animationSpeed, Interpolation.swingOut),
+                Actions.run { // "i!"
+                    title3.isAnimated = true
+                    title3.addAction(Actions.fadeIn(2f * animationSpeed))
+                    title4.addAction(Actions.fadeIn(2f * animationSpeed))
+                },
+                Actions.sizeTo(title2.width, title2.height, .5f * animationSpeed, Interpolation.bounceOut),
+                Actions.run {
+                    titleAnimationPlaying = false
+                    touchToStartLabel.isVisible = true
+                }
+        ))
     }
 }
