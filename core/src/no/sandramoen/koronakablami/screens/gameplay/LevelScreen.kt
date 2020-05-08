@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Stack
 import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.utils.Array
 import no.sandramoen.koronakablami.actors.*
 import no.sandramoen.koronakablami.utils.BaseActor
 import no.sandramoen.koronakablami.utils.BaseGame
@@ -19,11 +20,10 @@ import kotlin.math.ceil
 
 class LevelScreen : BaseScreen() {
 
-    var width = 0f // will be initialized upon initialize()
-    var height = 0f // will be initialized upon initialize()
+    private var width = 0f // will be initialized upon initialize()
+    private var height = 0f // will be initialized upon initialize()
 
-    lateinit var player: Player
-
+    private lateinit var player: Player
     private var playerMayShoot = false
     private var pause = true
     private var titleAnimationPlaying = true
@@ -31,6 +31,7 @@ class LevelScreen : BaseScreen() {
     private var scoreMotivationalMultiplier = 1f
     private var playNewHighScoreSoundOnce = true
     private var laserHits: Int = 0
+    private lateinit var backgrounds: Array<Parallax>
 
     private var enemyTimer = 0f
     private var enemySpeed = 100f
@@ -58,36 +59,38 @@ class LevelScreen : BaseScreen() {
         BaseGame.levelMusic!!.volume = BaseGame.audioVolume
         BaseGame.levelMusic!!.play()
 
-        Parallax(0f, 0f, mainStage, "background4", height * .032f)
-        Parallax(0f, height, mainStage, "background4", height * .032f)
-        Parallax(0f, 0f, mainStage, "background3", height * .049f)
-        Parallax(0f, height, mainStage, "background3", height * .049f)
-        Parallax(0f, 0f, mainStage, "background2", height * .066f)
-        Parallax(0f, height, mainStage, "background2", height * .066f)
-        Parallax(0f, 0f, mainStage, "background1", height * .083f)
-        Parallax(0f, height, mainStage, "background1", height * .083f)
-        Parallax(0f, 0f, mainStage, "background0", height * .1f)
-        Parallax(0f, height, mainStage, "background0", height * .1f)
+        backgrounds = Array<Parallax>()
+        backgrounds.add(Parallax(0f, 0f, mainStage, "background4", height * .032f))
+        backgrounds.add(Parallax(0f, height, mainStage, "background4", height * .032f))
+        backgrounds.add(Parallax(0f, 0f, mainStage, "background3", height * .049f))
+        backgrounds.add(Parallax(0f, height, mainStage, "background3", height * .049f))
+        backgrounds.add(Parallax(0f, 0f, mainStage, "background2", height * .066f))
+        backgrounds.add(Parallax(0f, height, mainStage, "background2", height * .066f))
+        backgrounds.add(Parallax(0f, 0f, mainStage, "background1", height * .083f))
+        backgrounds.add(Parallax(0f, height, mainStage, "background1", height * .083f))
+        backgrounds.add(Parallax(0f, 0f, mainStage, "background0", height * .1f))
+        backgrounds.add(Parallax(0f, height, mainStage, "background0", height * .1f))
 
-        Parallax(0f, 0f, mainStage, "bloodCellsBackground0", height * .15f)
-        Parallax(0f, height, mainStage, "bloodCellsBackground0", height * .15f)
-        Parallax(0f, 0f, mainStage, "platelets0", height * .12f)
-        Parallax(0f, height, mainStage, "platelets0", height * .12f)
-        Parallax(0f, 0f, mainStage, "whiteBloodCells0", height * .05f)
-        Parallax(0f, height, mainStage, "whiteBloodCells0", height * .05f)
-        Parallax(0f, 0f, mainStage, "bloodCellsBackground1", height * .2f)
-        Parallax(0f, height, mainStage, "bloodCellsBackground1", height * .2f)
-        Parallax(0f, 0f, mainStage, "bloodCellsBackground2", height * .25f)
-        Parallax(0f, height, mainStage, "bloodCellsBackground2", height * .25f)
+        backgrounds.add(Parallax(0f, 0f, mainStage, "bloodCellsBackground0", height * .15f))
+        backgrounds.add(Parallax(0f, height, mainStage, "bloodCellsBackground0", height * .15f))
+        backgrounds.add(Parallax(0f, 0f, mainStage, "platelets0", height * .12f))
+        backgrounds.add(Parallax(0f, height, mainStage, "platelets0", height * .12f))
+        backgrounds.add(Parallax(0f, 0f, mainStage, "whiteBloodCells0", height * .05f))
+        backgrounds.add(Parallax(0f, height, mainStage, "whiteBloodCells0", height * .05f))
+        backgrounds.add(Parallax(0f, 0f, mainStage, "bloodCellsBackground1", height * .2f))
+        backgrounds.add(Parallax(0f, height, mainStage, "bloodCellsBackground1", height * .2f))
+        backgrounds.add(Parallax(0f, 0f, mainStage, "bloodCellsBackground2", height * .25f))
+        backgrounds.add(Parallax(0f, height, mainStage, "bloodCellsBackground2", height * .25f))
 
         BaseActor.setWorldBounds(width, height)
         player = Player(0f, 0f, mainStage)
         player.setPosition(Gdx.graphics.width / 2f - player.width / 2f, Gdx.graphics.height * .03f)
         player.isVisible = false
 
-        Parallax(0f, 0f, mainStage, "bloodCellsBackground3", height * .1f)
-        Parallax(0f, height, mainStage, "bloodCellsBackground3", height * .1f)
+        backgrounds.add(Parallax(0f, 0f, mainStage, "bloodCellsBackground3", height * .1f))
+        backgrounds.add(Parallax(0f, height, mainStage, "bloodCellsBackground3", height * .1f))
 
+        // user interface, overlay menu
         scoreLabelA = Label("Score: ", BaseGame.labelStyle)
         scoreLabelA.setFontScale(.5f)
         scoreLabelA.isVisible = false
@@ -181,6 +184,7 @@ class LevelScreen : BaseScreen() {
         if (BaseGame.miss) {
             laserHits = 0
             scoreMotivationalMultiplier = 1f
+            resetBackgroundSpeed()
         }
 
         for (enemy: BaseActor in BaseActor.getList(mainStage, Enemy::class.java.canonicalName)) {
@@ -300,6 +304,7 @@ class LevelScreen : BaseScreen() {
         playNewHighScoreSoundOnce = true
         laserHits = 0
         scoreMotivationalMultiplier = 1f
+        resetBackgroundSpeed()
         GameUtils.saveGameState()
         renderOverlay()
     }
@@ -470,13 +475,17 @@ class LevelScreen : BaseScreen() {
             }
         }
 
+
+        for (background in backgrounds)
+            background.setSpeed(background.originalSpeed * scoreMotivationalMultiplier)
+
         if (motivationLabel.actions.size == 0 && !motivationLabel.textEquals(motivation)) {
             motivationLabel.setText(motivation)
             motivationLabel.color.a = 0f
             motivationLabel.addAction(Actions.sequence(
-                    Actions.fadeIn(.3f),
-                    Actions.delay(.4f),
-                    Actions.fadeOut(.3f)
+                    Actions.fadeIn(.5f),
+                    Actions.delay(.6f),
+                    Actions.fadeOut(.5f)
             ))
         }
     }
@@ -491,5 +500,10 @@ class LevelScreen : BaseScreen() {
         if (!animated) duration = 0f
         scoreLabelA.addAction(Actions.moveTo(moveA, scoreLabelA.y, duration, Interpolation.pow5))
         scoreLabelBGroup.addAction(Actions.moveTo(moveB, scoreLabelB.y, duration, Interpolation.pow5))
+    }
+
+    private fun resetBackgroundSpeed() {
+        for (background in backgrounds)
+            background.setSpeed(background.originalSpeed)
     }
 }
