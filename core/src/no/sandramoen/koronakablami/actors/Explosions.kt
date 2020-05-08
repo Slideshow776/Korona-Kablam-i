@@ -21,7 +21,7 @@ class Explosions(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
         this.addActor(effect)
         effect.start()
 
-        for (i in 4..20)
+        for (i in 4..15)
             createRandomExplosion(s)
 
         addAction(Actions.sequence( // delayed remove()

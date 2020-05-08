@@ -19,8 +19,6 @@ class Laser(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
                 Actions.removeActor()))
         )
 
-
-
         setSpeed(Gdx.graphics.height / 1f) // pixels / seconds
         setMaxSpeed(Gdx.graphics.height / 1f)
         setDeceleration(0f)

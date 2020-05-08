@@ -50,6 +50,9 @@ class LevelScreen : BaseScreen() {
     private lateinit var title4: BaseActor
     private lateinit var highScoreLabel: Label
     private lateinit var touchToStartLabel: Label
+    private lateinit var tiltTutorialLabel: Label
+    private var tiltTutorialTimer = 0f
+    private var tiltTutorialIsActive = false
 
     override fun initialize() {
         width = Gdx.graphics.width.toFloat()
@@ -84,7 +87,7 @@ class LevelScreen : BaseScreen() {
 
         BaseActor.setWorldBounds(width, height)
         player = Player(0f, 0f, mainStage)
-        player.setPosition(Gdx.graphics.width / 2f - player.width / 2f, Gdx.graphics.height * .03f)
+        player.setPosition(width / 2f - player.width / 2f, height * .03f)
         player.isVisible = false
 
         backgrounds.add(Parallax(0f, 0f, mainStage, "bloodCellsBackground3", height * .1f))
@@ -136,6 +139,10 @@ class LevelScreen : BaseScreen() {
                 Actions.alpha(.5f, .5f)
         )))
 
+        tiltTutorialLabel = Label("Tilt to go left or right!", BaseGame.labelStyle)
+        tiltTutorialLabel.setFontScale(.35f)
+        tiltTutorialLabel.color.a = 0f
+
         val uiTable = Table()
         uiTable.setFillParent(true)
 
@@ -148,6 +155,7 @@ class LevelScreen : BaseScreen() {
         uiTable.add(highScoreLabel).colspan(4).padTop(height * .01f).row()
         uiTable.add(overlayScoreLabel).colspan(4).padTop(height * .01f).row()
         uiTable.add(touchToStartLabel).colspan(4).padTop(height * .02f).padBottom(height * .15f).row()
+        uiTable.add(tiltTutorialLabel).colspan(4).padTop(height * .02f).padBottom(height * .15f).row()
         uiTable.add().expandY()
 
         /*uiTable.debug = true*/
@@ -160,28 +168,14 @@ class LevelScreen : BaseScreen() {
         if (titleAnimationPlaying)
             return
 
-        enemyTimer += dt
-        if (enemyTimer > enemySpawnInterval) {
-            val enemy = Enemy(0f, 0f, mainStage)
-            enemy.setPosition(MathUtils.random(0f, width - enemy.width), height)
-            enemy.setSpeed(enemySpeed)
-
-            enemyTimer = 0f
-            enemySpawnInterval -= .1f
-            enemySpeed += 10
-
-            if (enemySpawnInterval < .5f)
-                enemySpawnInterval = .5f
-
-            if (enemySpeed > 400f)
-                enemySpeed = 400f
-        }
+        spawnEnemies(dt)
 
         if (BaseGame.gameOver || pause)
             return
 
         playerMayShoot = BaseActor.count(mainStage, Laser::class.java.canonicalName) <= 2
         if (BaseGame.miss) {
+            BaseGame.miss = false
             laserHits = 0
             scoreMotivationalMultiplier = 1f
             resetBackgroundSpeed()
@@ -211,7 +205,6 @@ class LevelScreen : BaseScreen() {
                     tempLabel.setSpeed(tempEnemy.getSpeed())
                     tempEnemy.die()
                     laser.remove()
-                    BaseGame.miss = false
                     laserHits++
                     addToScore(100f)
                     motivate()
@@ -232,6 +225,8 @@ class LevelScreen : BaseScreen() {
                 rna.remove()
             }
         }
+
+        tiltTutorial(dt)
     }
 
     override fun keyDown(keycode: Int): Boolean { // desktop controls
@@ -284,6 +279,9 @@ class LevelScreen : BaseScreen() {
 
             for (enemy: BaseActor in BaseActor.getList(mainStage, Enemy::class.java.canonicalName))
                 enemy.remove()
+            for (rna: BaseActor in BaseActor.getList(mainStage, RNA::class.java.canonicalName))
+                rna.remove()
+
             enemyTimer = 0f
             enemySpeed = 100f
             enemySpawnInterval = 3f
@@ -301,6 +299,8 @@ class LevelScreen : BaseScreen() {
         BaseGame.gameOver = true
         playerMayShoot = false
         player.isVisible = false
+        player.hasMoved = false
+        resetTutorial()
         playNewHighScoreSoundOnce = true
         laserHits = 0
         scoreMotivationalMultiplier = 1f
@@ -475,7 +475,6 @@ class LevelScreen : BaseScreen() {
             }
         }
 
-
         for (background in backgrounds)
             background.setSpeed(background.originalSpeed * scoreMotivationalMultiplier)
 
@@ -505,5 +504,55 @@ class LevelScreen : BaseScreen() {
     private fun resetBackgroundSpeed() {
         for (background in backgrounds)
             background.setSpeed(background.originalSpeed)
+    }
+
+    private fun tiltTutorial(dt: Float) {
+        if (tiltTutorialTimer < 10)
+            tiltTutorialTimer += dt
+        else if (player.hasMoved && tiltTutorialIsActive) {
+            tiltTutorialIsActive = false
+            tiltTutorialLabel.clearActions()
+            tiltTutorialLabel.addAction(Actions.fadeOut(1f))
+        } else if (!player.hasMoved && !tiltTutorialIsActive) {
+            tiltTutorialIsActive = true
+            tiltTutorialLabel.addAction(Actions.forever(Actions.sequence(
+                    Actions.alpha(1f, .5f),
+                    Actions.alpha(.5f, .5f)
+            )))
+        }
+    }
+
+    private fun resetTutorial() {
+        tiltTutorialTimer = 0f
+        tiltTutorialIsActive = false
+        tiltTutorialLabel.clearActions()
+        tiltTutorialLabel.color.a = 0f
+    }
+
+    private fun spawnEnemies(dt: Float) {
+        enemyTimer += dt
+        if (enemyTimer > enemySpawnInterval) {
+            val enemy = Enemy(0f, 0f, mainStage)
+            if (!player.hasMoved && !title0.isVisible) { // don't spawn in player shooting field
+                if (MathUtils.randomBoolean()) // left
+                    enemy.setPosition(MathUtils.random(0f, (width / 2f - player.width / 2f) - enemy.width), height)
+                else // right
+                    enemy.setPosition(MathUtils.random((width / 2f - player.width / 2f) + enemy.width / 2.3f, width - enemy.width), height)
+            } else
+                enemy.setPosition(MathUtils.random(0f, width - enemy.width), height)
+            enemy.setSpeed(enemySpeed)
+
+            enemyTimer = 0f
+            if (player.hasMoved) {
+                enemySpawnInterval -= .1f
+                enemySpeed += 10
+            }
+
+            if (enemySpawnInterval < .5f)
+                enemySpawnInterval = .5f
+
+            if (enemySpeed > 400f)
+                enemySpeed = 400f
+        }
     }
 }
