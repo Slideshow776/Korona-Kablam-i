@@ -1,3 +1,5 @@
 package no.sandramoen.koronakablami.actors
 
-class BloodEffect : ParticleActor("effects/bloodEffect.pfx", "images/included/"){}
+import no.sandramoen.koronakablami.utils.BaseGame
+
+class BloodEffect : ParticleActor(BaseGame.bloodEffect)

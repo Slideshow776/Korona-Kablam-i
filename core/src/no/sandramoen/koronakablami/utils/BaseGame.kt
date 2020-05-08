@@ -7,6 +7,7 @@ import com.badlogic.gdx.Preferences
 import com.badlogic.gdx.assets.AssetDescriptor
 import com.badlogic.gdx.assets.AssetErrorListener
 import com.badlogic.gdx.assets.AssetManager
+import com.badlogic.gdx.assets.loaders.ParticleEffectLoader.ParticleEffectParameter
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
 import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.audio.Sound
@@ -21,8 +22,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable
-import com.badlogic.gdx.utils.Array
-import no.sandramoen.koronakablami.utils.BaseScreen
+
 
 abstract class BaseGame : Game(), AssetErrorListener {
     init {
@@ -53,6 +53,9 @@ abstract class BaseGame : Game(), AssetErrorListener {
         var audioVolume = .25f
         var miss = false
         var gameOver = true
+        var bloodEffect: ParticleEffect? = null
+        var exhaustEffect: ParticleEffect? = null
+        var explosionsEffect: ParticleEffect? = null
 
         fun setActiveScreen(s: BaseScreen) {
             game?.setScreen(s)
@@ -80,8 +83,18 @@ abstract class BaseGame : Game(), AssetErrorListener {
         val resolver = InternalFileHandleResolver()
         assetManager.setLoader(FreeTypeFontGenerator::class.java, FreeTypeFontGeneratorLoader(resolver))
         assetManager.setLoader(BitmapFont::class.java, ".ttf", FreetypeFontLoader(resolver))
+
+        val particleEffectParameter = ParticleEffectParameter()
+        particleEffectParameter.atlasFile = "images/included/packed/koronakablami.pack.atlas"
+        assetManager.load("effects/bloodEffect.pfx", ParticleEffect::class.java, particleEffectParameter)
+        assetManager.load("effects/exhaustEffect.pfx", ParticleEffect::class.java, particleEffectParameter)
+        assetManager.load("effects/explosionsEffect.pfx", ParticleEffect::class.java, particleEffectParameter)
+
         assetManager.finishLoading();
         textureAtlas = assetManager.get("images/included/packed/koronakablami.pack.atlas") // all images are found in this global static variable
+        bloodEffect = assetManager.get("effects/bloodEffect.pfx", ParticleEffect::class.java)
+        exhaustEffect = assetManager.get("effects/exhaustEffect.pfx", ParticleEffect::class.java)
+        explosionsEffect = assetManager.get("effects/explosionsEffect.pfx", ParticleEffect::class.java)
 
         // images that are excluded from the asset manager
         splashTexture = Texture(Gdx.files.internal("images/excluded/splash.jpg"))

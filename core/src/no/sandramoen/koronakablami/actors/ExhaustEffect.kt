@@ -1,3 +1,5 @@
 package no.sandramoen.koronakablami.actors
 
-class ExhaustEffect : ParticleActor("effects/exhaustEffect.pfx", "images/included/"){}
+import no.sandramoen.koronakablami.utils.BaseGame
+
+class ExhaustEffect : ParticleActor(BaseGame.exhaustEffect)
