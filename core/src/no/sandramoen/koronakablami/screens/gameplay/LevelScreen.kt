@@ -507,9 +507,9 @@ class LevelScreen : BaseScreen() {
     }
 
     private fun tiltTutorial(dt: Float) {
-        if (tiltTutorialTimer < 10)
+        if (tiltTutorialTimer < 6) {
             tiltTutorialTimer += dt
-        else if (player.hasMoved && tiltTutorialIsActive) {
+        } else if (player.hasMoved && tiltTutorialIsActive) {
             tiltTutorialIsActive = false
             tiltTutorialLabel.clearActions()
             tiltTutorialLabel.addAction(Actions.fadeOut(1f))
