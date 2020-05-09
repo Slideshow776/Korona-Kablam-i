@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.utils.Align
 import no.sandramoen.koronakablami.utils.BaseActor
+import no.sandramoen.koronakablami.utils.BaseGame
 
 class RNA(x: Float, y: Float, s: Stage) : BaseActor(x, y, s){
     var vertexShaderCode: String
@@ -29,8 +30,8 @@ class RNA(x: Float, y: Float, s: Stage) : BaseActor(x, y, s){
         val spin = Actions.rotateBy(7f, 1f)
         this.addAction(Actions.forever(spin))
 
-        vertexShaderCode = Gdx.files.internal("shaders/default.vs").readString()
-        fragmenterShaderCode = Gdx.files.internal("shaders/glow-pulse.fs").readString()
+        vertexShaderCode = BaseGame.defaultShader.toString()
+        fragmenterShaderCode = BaseGame.glowPulseShader.toString()
         shaderProgram = ShaderProgram(vertexShaderCode, fragmenterShaderCode)
         if (!shaderProgram.isCompiled)
             Gdx.app.error("RNA.kt", "Shader compile error: " + shaderProgram.log)

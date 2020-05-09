@@ -35,11 +35,19 @@ abstract class BaseGame : Game(), AssetErrorListener {
         lateinit var assetManager: AssetManager
         lateinit var fontGenerator: FreeTypeFontGenerator
 
+        // game assets
         var labelStyle: LabelStyle? = null
         var textButtonStyle: TextButtonStyle? = null
         var textureAtlas: TextureAtlas? = null
         var splashAnim: Animation<TextureRegion>? = null
         var splashTexture: Texture? = null
+        var bloodEffect: ParticleEffect? = null
+        var exhaustEffect: ParticleEffect? = null
+        var explosionsEffect: ParticleEffect? = null
+        var defaultShader: String? = null
+        var glowPulseShader: String? = null
+        var shockwaveShader: String? = null
+        var waveShader: String? = null
 
         // game state
         var prefs: Preferences? = null
@@ -53,9 +61,6 @@ abstract class BaseGame : Game(), AssetErrorListener {
         var audioVolume = .25f
         var miss = false
         var gameOver = true
-        var bloodEffect: ParticleEffect? = null
-        var exhaustEffect: ParticleEffect? = null
-        var explosionsEffect: ParticleEffect? = null
 
         fun setActiveScreen(s: BaseScreen) {
             game?.setScreen(s)
@@ -83,14 +88,20 @@ abstract class BaseGame : Game(), AssetErrorListener {
         val resolver = InternalFileHandleResolver()
         assetManager.setLoader(FreeTypeFontGenerator::class.java, FreeTypeFontGeneratorLoader(resolver))
         assetManager.setLoader(BitmapFont::class.java, ".ttf", FreetypeFontLoader(resolver))
+        assetManager.setLoader(Text::class.java, TextLoader(InternalFileHandleResolver()))
+
+        assetManager.load(AssetDescriptor("shaders/default.vs", Text::class.java, TextLoader.TextParameter()))
+        assetManager.load(AssetDescriptor("shaders/glow-pulse.fs", Text::class.java, TextLoader.TextParameter()))
+        assetManager.load(AssetDescriptor("shaders/shockwave.fs", Text::class.java, TextLoader.TextParameter()))
+        assetManager.load(AssetDescriptor("shaders/wave.fs", Text::class.java, TextLoader.TextParameter()))
 
         val particleEffectParameter = ParticleEffectParameter()
         particleEffectParameter.atlasFile = "images/included/packed/koronakablami.pack.atlas"
         assetManager.load("effects/bloodEffect.pfx", ParticleEffect::class.java, particleEffectParameter)
         assetManager.load("effects/exhaustEffect.pfx", ParticleEffect::class.java, particleEffectParameter)
         assetManager.load("effects/explosionsEffect.pfx", ParticleEffect::class.java, particleEffectParameter)
+        assetManager.finishLoading()
 
-        assetManager.finishLoading();
         textureAtlas = assetManager.get("images/included/packed/koronakablami.pack.atlas") // all images are found in this global static variable
         bloodEffect = assetManager.get("effects/bloodEffect.pfx", ParticleEffect::class.java)
         exhaustEffect = assetManager.get("effects/exhaustEffect.pfx", ParticleEffect::class.java)
@@ -102,13 +113,18 @@ abstract class BaseGame : Game(), AssetErrorListener {
         splashAnim = Animation(1f, TextureRegion(splashTexture))
 
         // audio
-        // assetManager.load("audio/", Music::class.java)
         levelMusic = assetManager.get("audio/331876__furbyguy__idunnometloop.wav", Music::class.java)
         laserShotSound = assetManager.get("audio/Laser_Shoot3.wav", Sound::class.java)
         explosionsSound = assetManager.get("audio/Explosion15.wav", Sound::class.java)
         pickupSound = assetManager.get("audio/Pickup_Coin8.wav", Sound::class.java)
         newHighScoreSound = assetManager.get("audio/Powerup12.wav", Sound::class.java)
         screamSound = assetManager.get("audio/Explosion20.wav", Sound::class.java)
+
+        // text files
+        defaultShader = assetManager.get("shaders/default.vs", Text::class.java).getString()
+        glowPulseShader = assetManager.get("shaders/glow-pulse.fs", Text::class.java).getString()
+        shockwaveShader = assetManager.get("shaders/shockwave.fs", Text::class.java).getString()
+        waveShader = assetManager.get("shaders/wave.fs", Text::class.java).getString()
 
         // fonts
         FreeTypeFontGenerator.setMaxTextureSize(2048) // solves font bug that won't show some characters like "." and "," in android

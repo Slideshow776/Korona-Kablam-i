@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.Stage
 import no.sandramoen.koronakablami.utils.BaseActor
+import no.sandramoen.koronakablami.utils.BaseGame
 
 class Engine(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
     private var vertexShaderCode: String
@@ -18,8 +19,9 @@ class Engine(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
         width = Gdx.graphics.width * .11f
         height = Gdx.graphics.height * .11f * (Gdx.graphics.width.toFloat() / Gdx.graphics.height.toFloat())
 
-        vertexShaderCode = Gdx.files.internal("shaders/default.vs").readString()
-        fragmenterShaderCode = Gdx.files.internal("shaders/wave.fs").readString()
+        vertexShaderCode = BaseGame.defaultShader.toString()
+        fragmenterShaderCode = BaseGame.waveShader.toString()
+
         shaderProgram = ShaderProgram(vertexShaderCode, fragmenterShaderCode)
         if (!shaderProgram.isCompiled)
             Gdx.app.error("Engine.kt", "Shader compile error: " + shaderProgram.log)

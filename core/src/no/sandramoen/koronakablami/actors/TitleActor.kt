@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.Stage
 import no.sandramoen.koronakablami.utils.BaseActor
+import no.sandramoen.koronakablami.utils.BaseGame
 
 class TitleActor(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
     var isAnimated = false
@@ -20,8 +21,8 @@ class TitleActor(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
         width = Gdx.graphics.width * .1f
         height = Gdx.graphics.height * .20f * (Gdx.graphics.width.toFloat() / Gdx.graphics.height.toFloat())
 
-        vertexShaderCode = Gdx.files.internal("shaders/default.vs").readString()
-        fragmenterShaderCode = Gdx.files.internal("shaders/wave.fs").readString()
+        vertexShaderCode = BaseGame.defaultShader.toString()
+        fragmenterShaderCode = BaseGame.waveShader.toString()
         shaderProgram = ShaderProgram(vertexShaderCode, fragmenterShaderCode)
         if (!shaderProgram.isCompiled)
             Gdx.app.error("TitleActor.kt", "Shader compile error: " + shaderProgram.log)

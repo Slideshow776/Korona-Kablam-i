@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.actions.RunnableAction
 import no.sandramoen.koronakablami.utils.BaseActor
+import no.sandramoen.koronakablami.utils.BaseGame
 
 class ShockwaveBackground(x: Float, y: Float, texturePath: String, s: Stage) : BaseActor(x, y, s) {
     private var vertexShaderCode: String
@@ -27,8 +28,8 @@ class ShockwaveBackground(x: Float, y: Float, texturePath: String, s: Stage) : B
         height = Gdx.graphics.height.toFloat()
 
         ShaderProgram.pedantic = false
-        vertexShaderCode = Gdx.files.internal("shaders/default.vs").readString()
-        fragmenterShaderCode = Gdx.files.internal("shaders/shockwave.fs").readString()
+        vertexShaderCode = BaseGame.defaultShader.toString()
+        fragmenterShaderCode = BaseGame.shockwaveShader.toString()
         shaderProgram = ShaderProgram(vertexShaderCode, fragmenterShaderCode)
         if (!shaderProgram.isCompiled)
             Gdx.app.error("ShockwaveBackground", "Shader compile error: " + shaderProgram.log)

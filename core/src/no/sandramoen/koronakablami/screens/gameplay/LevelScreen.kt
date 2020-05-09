@@ -279,7 +279,7 @@ class LevelScreen : BaseScreen() {
             scoreLabelB.setText("${score.toLong()}")
             centerScoreLabel(false)
             player.isVisible = true
-            player.setPosition(Gdx.graphics.width / 2f - player.width / 2f, Gdx.graphics.height * .03f)
+            player.setPosition(width / 2f - player.width / 2f, height * .03f)
 
             for (enemy: BaseActor in BaseActor.getList(mainStage, Enemy::class.java.canonicalName))
                 enemy.remove()
@@ -331,7 +331,7 @@ class LevelScreen : BaseScreen() {
         val actor = BaseActor(0f, 0f, uiStage)
         actor.loadImage(name)
         actor.width = width * widthPercent
-        actor.height = Gdx.graphics.height * .20f * (width / height)
+        actor.height = height * .20f * (width / height)
         return actor
     }
 
