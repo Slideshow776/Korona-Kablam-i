@@ -36,6 +36,8 @@ class LevelScreen : BaseScreen() {
     private var enemyTimer = 0f
     private var enemySpeed = 100f
     private var enemySpawnInterval = 3f
+    private var enemyPhaseTimer = 0f
+    private lateinit var boss: EnemyBoss
 
     private lateinit var scoreLabelA: Label
     private lateinit var scoreLabelB: Label
@@ -93,6 +95,8 @@ class LevelScreen : BaseScreen() {
 
         backgrounds.add(Parallax(0f, 0f, mainStage, "bloodCellsBackground3", height * .1f))
         backgrounds.add(Parallax(0f, height, mainStage, "bloodCellsBackground3", height * .1f))
+
+        boss = EnemyBoss(0f, height * 1.2f, mainStage)
 
         // user interface, overlay menu
         scoreLabelA = Label("Score: ", BaseGame.labelStyle)
@@ -172,7 +176,20 @@ class LevelScreen : BaseScreen() {
         if (titleAnimationPlaying)
             return
 
-        spawnEnemies(dt)
+        if (!boss.active && enemyPhaseTimer > boss.spawnTime) {
+            boss.activate()
+            if (boss.defeated == 0) setMotivationText("What's this?!")
+            else setMotivationText("It's back!")
+            enemyPhaseTimer = 0f
+            for (i in 10 until backgrounds.size)
+                backgrounds[i].addAction(Actions.fadeOut(1f))
+        } else if (!boss.active) {
+            if (backgrounds[10].color.a == 0f)
+                for (i in 10 until backgrounds.size)
+                    backgrounds[i].addAction(Actions.fadeIn(1f))
+            spawnEnemies(dt)
+            enemyPhaseTimer += dt
+        }
 
         if (BaseGame.gameOver || pause)
             return
@@ -227,6 +244,24 @@ class LevelScreen : BaseScreen() {
                 tempLabel.centerAtActor(rna)
                 tempLabel.setSpeed(rna.getSpeed())
                 rna.remove()
+            }
+        }
+
+        for (laser: BaseActor in BaseActor.getList(mainStage, Laser::class.java.canonicalName)) {
+            if (laser.overlaps(boss)) {
+                BaseGame.explosionsSound!!.play(BaseGame.audioVolume)
+                val explosion = Explosions(0f, 0f, mainStage)
+                explosion.centerAtActor(laser)
+                explosion.x += width * .08f
+                val tempLabel = ScoreLabel(0f, 0f, mainStage, "+${ceil(100f * scoreMotivationalMultiplier).toLong()}")
+                tempLabel.scaleBy(-.6f)
+                tempLabel.centerAtActor(laser)
+                tempLabel.x += width * .08f
+                laser.remove()
+                addToScore(100f)
+                scoreLabelB.setText("${score.toLong()}")
+                checkHighScore()
+                boss.hit()
             }
         }
 
@@ -366,8 +401,8 @@ class LevelScreen : BaseScreen() {
         ))
     }
 
-    private fun addToScore(score: Float) {
-        this.score += ceil(score * scoreMotivationalMultiplier)
+    private fun addToScore(baseScore: Float) {
+        this.score += ceil(baseScore * scoreMotivationalMultiplier)
         scoreLabelB.setText("${this.score.toLong()}")
         scoreLabelBGroup.addAction(Actions.sequence(
                 Actions.scaleBy(.15f, .15f, .05f),
@@ -470,13 +505,7 @@ class LevelScreen : BaseScreen() {
             background.setSpeed(background.originalSpeed * scoreMotivationalMultiplier)
 
         if (motivationLabel.actions.size == 0 && !motivationLabel.textEquals(motivation)) {
-            motivationLabel.setText(motivation)
-            motivationLabel.color.a = 0f
-            motivationLabel.addAction(Actions.sequence(
-                    Actions.fadeIn(.5f),
-                    Actions.delay(.6f),
-                    Actions.fadeOut(.5f)
-            ))
+            setMotivationText(motivation)
         }
     }
 
@@ -536,14 +565,14 @@ class LevelScreen : BaseScreen() {
             enemyTimer = 0f
             if (player.hasMoved) {
                 enemySpawnInterval -= .1f
-                enemySpeed += 10
+                enemySpeed += height * .0042f
             }
 
             if (enemySpawnInterval < .5f)
                 enemySpawnInterval = .5f
 
-            if (enemySpeed > 400f)
-                enemySpeed = 400f
+            if (enemySpeed > height * .171f)
+                enemySpeed = height * .171f
         }
     }
 
@@ -563,6 +592,16 @@ class LevelScreen : BaseScreen() {
                     titleAnimationPlaying = false
                     touchToStartLabel.isVisible = true
                 }
+        ))
+    }
+
+    private fun setMotivationText(message: String) {
+        motivationLabel.setText(message)
+        motivationLabel.color.a = 0f
+        motivationLabel.addAction(Actions.sequence(
+                Actions.fadeIn(.5f),
+                Actions.delay(.6f),
+                Actions.fadeOut(.5f)
         ))
     }
 }

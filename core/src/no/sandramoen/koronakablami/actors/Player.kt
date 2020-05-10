@@ -65,7 +65,6 @@ class Player(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
                 Gdx.input.isKeyPressed(Keys.D) -> moveRight()
                 else -> moveForward()
             }
-
         }
     }
 

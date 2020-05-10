@@ -1,11 +1,13 @@
 ﻿package no.sandramoen.koronakablami.actors
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.ParticleEffect
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Group
+import no.sandramoen.koronakablami.utils.BaseGame
 
-open class ParticleActor(particleEffect: ParticleEffect?) : Group() {
+open class ParticleActor(pfxFile: String) : Group() {
     private var effect: ParticleEffect = ParticleEffect()
     private var renderingActor: ParticleRenderer
 
@@ -16,8 +18,7 @@ open class ParticleActor(particleEffect: ParticleEffect?) : Group() {
     }
 
     init {
-        if (particleEffect != null)
-            effect = particleEffect
+        effect.load(Gdx.files.internal(pfxFile), BaseGame.textureAtlas!!)
         renderingActor = ParticleRenderer(effect)
         this.addActor(renderingActor)
     }

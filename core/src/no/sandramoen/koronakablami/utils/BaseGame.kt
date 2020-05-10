@@ -7,7 +7,6 @@ import com.badlogic.gdx.Preferences
 import com.badlogic.gdx.assets.AssetDescriptor
 import com.badlogic.gdx.assets.AssetErrorListener
 import com.badlogic.gdx.assets.AssetManager
-import com.badlogic.gdx.assets.loaders.ParticleEffectLoader.ParticleEffectParameter
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
 import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.audio.Sound
@@ -41,9 +40,6 @@ abstract class BaseGame : Game(), AssetErrorListener {
         var textureAtlas: TextureAtlas? = null
         var splashAnim: Animation<TextureRegion>? = null
         var splashTexture: Texture? = null
-        var bloodEffect: ParticleEffect? = null
-        var exhaustEffect: ParticleEffect? = null
-        var explosionsEffect: ParticleEffect? = null
         var defaultShader: String? = null
         var glowPulseShader: String? = null
         var shockwaveShader: String? = null
@@ -94,18 +90,9 @@ abstract class BaseGame : Game(), AssetErrorListener {
         assetManager.load(AssetDescriptor("shaders/glow-pulse.fs", Text::class.java, TextLoader.TextParameter()))
         assetManager.load(AssetDescriptor("shaders/shockwave.fs", Text::class.java, TextLoader.TextParameter()))
         assetManager.load(AssetDescriptor("shaders/wave.fs", Text::class.java, TextLoader.TextParameter()))
-
-        val particleEffectParameter = ParticleEffectParameter()
-        particleEffectParameter.atlasFile = "images/included/packed/koronakablami.pack.atlas"
-        assetManager.load("effects/bloodEffect.pfx", ParticleEffect::class.java, particleEffectParameter)
-        assetManager.load("effects/exhaustEffect.pfx", ParticleEffect::class.java, particleEffectParameter)
-        assetManager.load("effects/explosionsEffect.pfx", ParticleEffect::class.java, particleEffectParameter)
         assetManager.finishLoading()
 
         textureAtlas = assetManager.get("images/included/packed/koronakablami.pack.atlas") // all images are found in this global static variable
-        bloodEffect = assetManager.get("effects/bloodEffect.pfx", ParticleEffect::class.java)
-        exhaustEffect = assetManager.get("effects/exhaustEffect.pfx", ParticleEffect::class.java)
-        explosionsEffect = assetManager.get("effects/explosionsEffect.pfx", ParticleEffect::class.java)
 
         // images that are excluded from the asset manager
         splashTexture = Texture(Gdx.files.internal("images/excluded/splash.jpg"))

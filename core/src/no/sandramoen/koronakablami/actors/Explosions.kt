@@ -18,7 +18,7 @@ class Explosions(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
         val effect = ExplosionsEffect()
         effect.setPosition(width / 4, height / 3) // by trial and error...
         effect.setScale(Gdx.graphics.height * .00025f)
-        this.addActor(effect)
+        addActor(effect)
         effect.start()
 
         for (i in 4..15)
