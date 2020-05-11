@@ -182,11 +182,11 @@ class LevelScreen : BaseScreen() {
             else setMotivationText("It's back!")
             enemyPhaseTimer = 0f
             for (i in 10 until backgrounds.size)
-                backgrounds[i].addAction(Actions.fadeOut(1f))
+                backgrounds[i].addAction(Actions.fadeOut(5f, Interpolation.pow5Out))
         } else if (!boss.active) {
             if (backgrounds[10].color.a == 0f)
                 for (i in 10 until backgrounds.size)
-                    backgrounds[i].addAction(Actions.fadeIn(1f))
+                    backgrounds[i].addAction(Actions.fadeIn(5f))
             spawnEnemies(dt)
             enemyPhaseTimer += dt
         }
@@ -257,11 +257,11 @@ class LevelScreen : BaseScreen() {
                 tempLabel.scaleBy(-.6f)
                 tempLabel.centerAtActor(laser)
                 tempLabel.x += width * .08f
-                laser.remove()
                 addToScore(100f)
                 scoreLabelB.setText("${score.toLong()}")
                 checkHighScore()
-                boss.hit()
+                boss.hit(laser.x)
+                laser.remove()
             }
         }
 

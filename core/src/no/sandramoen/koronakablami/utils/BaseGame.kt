@@ -54,6 +54,9 @@ abstract class BaseGame : Game(), AssetErrorListener {
         var pickupSound: Sound? = null
         var newHighScoreSound: Sound? = null
         var screamSound: Sound? = null
+        var bossAppearSound: Sound? = null
+        var bossHurtSound: Sound? = null
+        var bossDefeatedSound: Sound? = null
         var audioVolume = .25f
         var miss = false
         var gameOver = true
@@ -81,6 +84,9 @@ abstract class BaseGame : Game(), AssetErrorListener {
         assetManager.load("audio/Pickup_Coin8.wav", Sound::class.java)
         assetManager.load("audio/Powerup12.wav", Sound::class.java)
         assetManager.load("audio/Explosion20.wav", Sound::class.java)
+        assetManager.load("audio/Hit_Hurt47.wav", Sound::class.java)
+        assetManager.load("audio/Hit_Hurt48.wav", Sound::class.java)
+        assetManager.load("audio/Hit_Hurt49.wav", Sound::class.java)
         val resolver = InternalFileHandleResolver()
         assetManager.setLoader(FreeTypeFontGenerator::class.java, FreeTypeFontGeneratorLoader(resolver))
         assetManager.setLoader(BitmapFont::class.java, ".ttf", FreetypeFontLoader(resolver))
@@ -106,6 +112,9 @@ abstract class BaseGame : Game(), AssetErrorListener {
         pickupSound = assetManager.get("audio/Pickup_Coin8.wav", Sound::class.java)
         newHighScoreSound = assetManager.get("audio/Powerup12.wav", Sound::class.java)
         screamSound = assetManager.get("audio/Explosion20.wav", Sound::class.java)
+        bossDefeatedSound = assetManager.get("audio/Hit_Hurt47.wav", Sound::class.java)
+        bossHurtSound = assetManager.get("audio/Hit_Hurt48.wav", Sound::class.java)
+        bossAppearSound = assetManager.get("audio/Hit_Hurt49.wav", Sound::class.java)
 
         // text files
         defaultShader = assetManager.get("shaders/default.vs", Text::class.java).getString()
