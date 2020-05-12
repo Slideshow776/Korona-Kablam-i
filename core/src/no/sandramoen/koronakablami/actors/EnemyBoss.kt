@@ -10,78 +10,91 @@ import com.badlogic.gdx.utils.Array
 import no.sandramoen.koronakablami.utils.BaseActor
 import no.sandramoen.koronakablami.utils.BaseGame
 
-class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
+class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s){
     private var originalHealthPoints = 60
     private var healthPoints = 60
     private var originalX = x
     private var originalY = y
-    private var body: BaseActor
+    private var resetPosition = 0f // top offscreen
     private var leftEye: BaseActor
     private var rightEye: BaseActor
     private var tentacles: Array<EnemyBossTentacles>
     private var effects: Array<BossBloodEffect>
 
+    var body: BaseActor
     var spawnTime = MathUtils.random(17f, 117f)// 60f, 180f)
     var defeated = 0
     var active = false
 
     init {
+        // parent
         println("initializing boss...")
         width = Gdx.graphics.width.toFloat()
-        height = Gdx.graphics.height * .3f * (Gdx.graphics.width.toFloat() / Gdx.graphics.height.toFloat())
-        setBoundaryRectangle()
+        height = Gdx.graphics.height.toFloat()
+        setPosition(0f, 0f)
         effects = Array<BossBloodEffect>()
-
-        // tentacles
-        tentacles = Array<EnemyBossTentacles>()
-        for (i in 0..30) {
-            val tentacle = EnemyBossTentacles(x, y, s)
-            tentacle.loadImage("tentacle1")
-            tentacle.color = Color(MathUtils.random(.3f, 1f), MathUtils.random(.3f, 1f), MathUtils.random(.3f, 1f), 1f)
-            tentacle.width = Gdx.graphics.width.toFloat() / MathUtils.random(4f, 7f)
-            tentacle.height = Gdx.graphics.height * MathUtils.random(.4f, .6f)
-            tentacle.centerAtPosition(MathUtils.random(0f, width), height / MathUtils.random(1.5f, 2.5f))
-            tentacle.zIndex = 1
-            addActor(tentacle)
-            tentacles.add(tentacle)
-        }
 
         // body
         body = BaseActor(x, y, s)
         body.loadImage("enemyBoss1a")
         body.setBoundaryRectangle()
-        body.width = width
-        body.height = height
-        addActor(body)
-        body.centerAtPosition(width / 2, height / 2)
+        body.width = Gdx.graphics.width.toFloat()
+        body.height = Gdx.graphics.height * .45f * (Gdx.graphics.width.toFloat() / Gdx.graphics.height.toFloat())
+        body.setBoundaryRectangle()
+        resetPosition = Gdx.graphics.height.toFloat() * 1.3f
+        body.setPosition(0f, resetPosition)
+        body.color.a = 1f
+        /*body.debug = true*/
+
+        // tentacles
+        tentacles = Array<EnemyBossTentacles>()
+        val numTentacles = 15
+        for (i in 0..numTentacles) {
+            val tentacle = EnemyBossTentacles(x, y, s)
+            tentacle.loadImage("tentacle1")
+            tentacle.color = Color(MathUtils.random(.3f, 1f), MathUtils.random(.3f, 1f), MathUtils.random(.3f, 1f), 1f)
+            tentacle.width = Gdx.graphics.width * MathUtils.random(.1f, .3f)
+            tentacle.height = Gdx.graphics.height * MathUtils.random(.15f, .3f)
+            tentacle.setPosition(((body.width / numTentacles) * i) - tentacle.width / 2, 0f)
+            addActor(tentacle)
+            tentacles.add(tentacle)
+        }
 
         // eyes
         leftEye = BaseActor(x, y, s)
         leftEye.loadImage("enemyBoss1c")
-        leftEye.setBoundaryRectangle()
         leftEye.width = Gdx.graphics.width * .08f
         leftEye.height = leftEye.width * .75f
         leftEye.setOrigin(Align.center)
-        addActor(leftEye)
-        leftEye.centerAtPosition(2 * width / 8, height / 2)
+        body.addActor(leftEye)
+        leftEye.centerAtPosition(2 * body.width / 8, body.height / 2)
 
         rightEye = BaseActor(x, y, s)
         rightEye.loadImage("enemyBoss1c")
-        rightEye.setBoundaryRectangle()
         rightEye.width = leftEye.width
         rightEye.height = leftEye.height
         rightEye.setOrigin(Align.center)
-        addActor(rightEye)
-        rightEye.centerAtPosition(6 * width / 8, height / 2)
+        body.addActor(rightEye)
+        rightEye.centerAtPosition(6 * body.width / 8, body.height / 2)
 
         /*debug = true*/
+    }
+
+    override fun act(dt: Float) {
+        super.act(dt)
+
+        for (effect in effects)
+            effect.y = body.y
+
+        for (tentacle in tentacles)
+            tentacle.y = body.y - tentacle.height * .95f
     }
 
     fun activate() {
         println("activating boss...")
         active = true
         BaseGame.bossAppearSound!!.play(BaseGame.audioVolume)
-        addAction(Actions.moveTo(0f, Gdx.graphics.height - height, 5f))
+        body.addAction(Actions.moveTo(0f, Gdx.graphics.height - body.height, 5f))
     }
 
     fun hit(hitPositionX: Float) {
@@ -94,10 +107,9 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
 
             // blood effect
             val effect = BossBloodEffect()
-            effect.setPosition(hitPositionX, 0f - Gdx.graphics.height * .005f) // by trial and error...
+            effect.setPosition(hitPositionX, body.y - Gdx.graphics.height * .005f) // by trial and error...
             effect.setScale(Gdx.graphics.height * .00025f)
-            effect.toBack()
-            this.addActor(effect)
+            addActor(effect)
             effect.start()
             effects.add(effect)
 
@@ -115,7 +127,7 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
     }
 
     private fun defeated() {
-        if (actions.size == 0) {
+        if (body.actions.size == 0) {
             println("defeating boss!")
             BaseGame.bossDefeatedSound!!.play(BaseGame.audioVolume)
             // make sad eyes
@@ -123,8 +135,8 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
             rightEye.addAction(Actions.rotateTo(-40f, 1f))
             for (tentacle in tentacles)
                 tentacle.defeatedMultiplier = .25f
-            addAction(Actions.sequence(
-                    Actions.moveTo(originalX, originalY, 5f),
+            body.addAction(Actions.sequence(
+                    Actions.moveTo(originalX, resetPosition, 5f),
                     Actions.run {
                         defeated += 1
                         reset()
@@ -134,9 +146,9 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
     }
 
     private fun die() {
-        if (actions.size == 0) {
+        if (body.actions.size == 0) {
             println("killing boss!")
-            addAction(Actions.sequence(
+            body.addAction(Actions.sequence(
                     Actions.fadeOut(.5f),
                     Actions.run { reset() }
             ))
@@ -146,8 +158,8 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
     private fun reset() {
         println("resetting boss!")
         active = false
-        setPosition(originalX, originalY)
-        color.a = 1f
+        body.setPosition(originalX, resetPosition)
+        body.color.a = 1f
         healthPoints = 30
         spawnTime = MathUtils.random(17f, 117f)// 60f, 180f)
         for (effect in effects) effect.remove()

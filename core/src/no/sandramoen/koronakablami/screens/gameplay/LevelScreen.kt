@@ -248,7 +248,7 @@ class LevelScreen : BaseScreen() {
         }
 
         for (laser: BaseActor in BaseActor.getList(mainStage, Laser::class.java.canonicalName)) {
-            if (laser.overlaps(boss)) {
+            if (laser.overlaps(boss.body)) {
                 BaseGame.explosionsSound!!.play(BaseGame.audioVolume)
                 val explosion = Explosions(0f, 0f, mainStage)
                 explosion.centerAtActor(laser)
