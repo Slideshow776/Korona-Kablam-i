@@ -16,7 +16,11 @@ class EnemyBossTentacles(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
 
     var velocityXMultiplier = 1f
     var defeatedMultiplier = 1f
+    var speedVariationMultiplier = 1f
     var time = .0f
+    var runShader = false
+    var attacking = false
+    var originalHeight = 0f
 
     init {
         loadImage("enemy1b")
@@ -31,25 +35,28 @@ class EnemyBossTentacles(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
     }
 
     override fun draw(batch: Batch, parentAlpha: Float) {
-        try {
-            batch.shader = shaderProgram
-            shaderProgram.setUniformf("u_time", time)
-            shaderProgram.setUniformf("u_imageSize", Vector2(width, height))
-            shaderProgram.setUniformf("u_amplitude", Vector2(.2f, .01f))
-            shaderProgram.setUniformf("u_wavelength", Vector2(10f, 1f))
-            shaderProgram.setUniformf("u_velocity", Vector2(7f * velocityXMultiplier * defeatedMultiplier, 1f))
+        if (runShader) {
+            try {
+                batch.shader = shaderProgram
+                shaderProgram.setUniformf("u_time", time)
+                shaderProgram.setUniformf("u_imageSize", Vector2(width, height))
+                shaderProgram.setUniformf("u_amplitude", Vector2(1.8f, .01f))
+                shaderProgram.setUniformf("u_wavelength", Vector2(100f, 1f))
+                shaderProgram.setUniformf("u_velocity", Vector2(15f * velocityXMultiplier * defeatedMultiplier * speedVariationMultiplier, 1f))
+                super.draw(batch, parentAlpha)
+                batch.shader = null
+            } catch (error: Error) {
+                super.draw(batch, parentAlpha)
+            }
+        } else
             super.draw(batch, parentAlpha)
-            batch.shader = null
-        } catch (error: Error) {
-            super.draw(batch, parentAlpha)
-        }
     }
 
     override fun act(dt: Float) {
         super.act(dt)
         time += dt
 
-        if (velocityXMultiplier > 1f) velocityXMultiplier -= 3f
+        if (velocityXMultiplier > 1f) velocityXMultiplier -= .8f
         else if (velocityXMultiplier < 1f) velocityXMultiplier = 1f
     }
 }

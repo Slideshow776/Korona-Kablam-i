@@ -23,7 +23,7 @@ class Laser(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
         setMaxSpeed(Gdx.graphics.height / 1f)
         setDeceleration(0f)
         setMotionAngle(90f)
-        setBoundaryPolygon(8)
+        setBoundaryRectangle()
     }
 
     override fun act(dt: Float) {

@@ -19,7 +19,7 @@ class Player(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
         setAcceleration(Gdx.graphics.height / 1f) // pixels/seconds
         setMaxSpeed(Gdx.graphics.height / 4f)
         setDeceleration(Gdx.graphics.height / 1f)
-        setBoundaryPolygon(8)
+        setBoundaryRectangle()
 
         // engine
         engine = Engine(x, y, s)

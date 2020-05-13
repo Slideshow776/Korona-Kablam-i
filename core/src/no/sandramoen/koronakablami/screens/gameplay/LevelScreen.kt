@@ -92,6 +92,7 @@ class LevelScreen : BaseScreen() {
         player = Player(0f, 0f, mainStage)
         player.setPosition(width / 2f - player.width / 2f, height * .03f)
         player.isVisible = false
+        /*player.debug = true*/
 
         backgrounds.add(Parallax(0f, 0f, mainStage, "bloodCellsBackground3", height * .1f))
         backgrounds.add(Parallax(0f, height, mainStage, "bloodCellsBackground3", height * .1f))
@@ -124,10 +125,6 @@ class LevelScreen : BaseScreen() {
         title4 = createTitleFragment("title4", .1f)
         titleStack.add(title3)
         titleStack.add(title4)
-
-        titleStack.toBack()
-        title2.toFront()
-        title2.zIndex = 99
 
         highScoreLabel = Label("High Score: ${BaseGame.highScore.toLong()}", BaseGame.labelStyle)
         highScoreLabel.setFontScale(.55f)
@@ -178,8 +175,8 @@ class LevelScreen : BaseScreen() {
 
         if (!boss.active && enemyPhaseTimer > boss.spawnTime) {
             boss.activate()
-            if (boss.defeated == 0) setMotivationText("What's this?!")
-            else setMotivationText("It's back!")
+            if (boss.defeated == 0) setMotivationText("What's this?!", 1.5f)
+            else setMotivationText("It's back!", 1.5f)
             enemyPhaseTimer = 0f
             for (i in 10 until backgrounds.size)
                 backgrounds[i].addAction(Actions.fadeOut(5f, Interpolation.pow5Out))
@@ -203,12 +200,8 @@ class LevelScreen : BaseScreen() {
         }
 
         for (enemy: BaseActor in BaseActor.getList(mainStage, Enemy::class.java.canonicalName)) {
-            if (player.overlaps(enemy)) {
-                BaseGame.explosionsSound!!.play(BaseGame.audioVolume)
-                val explosion = Explosions(0f, 0f, mainStage)
-                explosion.centerAtPosition(player.x + player.width + width * .04f, player.y + player.height / 2)
-                setGameOver()
-            }
+            if (player.overlaps(enemy))
+                playerDeath()
             for (laser: BaseActor in BaseActor.getList(mainStage, Laser::class.java.canonicalName)) {
                 if (enemy.overlaps(laser)) {
                     BaseGame.explosionsSound!!.play(BaseGame.audioVolume)
@@ -265,6 +258,9 @@ class LevelScreen : BaseScreen() {
             }
         }
 
+        for (tentacle in boss.tentacles)
+            if (player.overlaps(tentacle))
+                playerDeath()
         tiltTutorial(dt)
     }
 
@@ -595,13 +591,20 @@ class LevelScreen : BaseScreen() {
         ))
     }
 
-    private fun setMotivationText(message: String) {
+    private fun setMotivationText(message: String, durationMultiplier: Float = 1f) {
         motivationLabel.setText(message)
         motivationLabel.color.a = 0f
         motivationLabel.addAction(Actions.sequence(
-                Actions.fadeIn(.5f),
-                Actions.delay(.6f),
-                Actions.fadeOut(.5f)
+                Actions.fadeIn(.5f * durationMultiplier),
+                Actions.delay(.6f * durationMultiplier),
+                Actions.fadeOut(.5f * durationMultiplier)
         ))
+    }
+
+    private fun playerDeath() {
+        BaseGame.explosionsSound!!.play(BaseGame.audioVolume)
+        val explosion = Explosions(0f, 0f, mainStage)
+        explosion.centerAtPosition(player.x + player.width + width * .04f, player.y + player.height / 2)
+        setGameOver()
     }
 }

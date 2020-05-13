@@ -21,7 +21,7 @@ class Enemy(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
 
         setSpeed(Gdx.graphics.height / 1f) // pixels / seconds
         setMotionAngle(270f)
-        setBoundaryPolygon(8)
+        setBoundaryRectangle()
 
         tentacles = Tentacles(x, y, s)
         addActor(tentacles)

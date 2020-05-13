@@ -10,19 +10,20 @@ import com.badlogic.gdx.utils.Array
 import no.sandramoen.koronakablami.utils.BaseActor
 import no.sandramoen.koronakablami.utils.BaseGame
 
-class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s){
+class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
     private var originalHealthPoints = 60
     private var healthPoints = 60
-    private var originalX = x
-    private var originalY = y
     private var resetPosition = 0f // top offscreen
     private var leftEye: BaseActor
     private var rightEye: BaseActor
-    private var tentacles: Array<EnemyBossTentacles>
     private var effects: Array<BossBloodEffect>
+    private var effectIndex = 0
+    private var time = 0f
+    private var tentaclesAttacking = 0
 
     var body: BaseActor
-    var spawnTime = MathUtils.random(17f, 117f)// 60f, 180f)
+    var tentacles: Array<EnemyBossTentacles>
+    var spawnTime = MathUtils.random(60f, 180f)
     var defeated = 0
     var active = false
 
@@ -49,15 +50,25 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s){
         // tentacles
         tentacles = Array<EnemyBossTentacles>()
         val numTentacles = 15
+        if (numTentacles > originalHealthPoints)
+            Gdx.app.error("EnemyBoss", "numTentacles is bigger than originalHealthPoints!")
         for (i in 0..numTentacles) {
             val tentacle = EnemyBossTentacles(x, y, s)
             tentacle.loadImage("tentacle1")
-            tentacle.color = Color(MathUtils.random(.3f, 1f), MathUtils.random(.3f, 1f), MathUtils.random(.3f, 1f), 1f)
+            tentacle.color = Color(MathUtils.random(.25f, 1f), MathUtils.random(.25f, 1f), MathUtils.random(.25f, 1f), 1f)
             tentacle.width = Gdx.graphics.width * MathUtils.random(.1f, .3f)
             tentacle.height = Gdx.graphics.height * MathUtils.random(.15f, .3f)
+            tentacle.originalHeight = tentacle.height
             tentacle.setPosition(((body.width / numTentacles) * i) - tentacle.width / 2, 0f)
+            tentacle.addAction(Actions.sequence( // mix up the movements so they're not uniform
+                    Actions.delay(MathUtils.random(0f, 5f)),
+                    Actions.run { tentacle.runShader = true }
+            ))
+            tentacle.speedVariationMultiplier = MathUtils.random(.8f, 1.2f)
+            addEffects(originalHealthPoints / numTentacles)
             addActor(tentacle)
             tentacles.add(tentacle)
+            /*tentacle.debug = true*/
         }
 
         // eyes
@@ -82,12 +93,32 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s){
 
     override fun act(dt: Float) {
         super.act(dt)
+        time += dt
 
         for (effect in effects)
             effect.y = body.y
 
         for (tentacle in tentacles)
             tentacle.y = body.y - tentacle.height * .95f
+
+        if (tentaclesAttacking < 3 && active && time > 10f) {
+            val chosenTentacle = tentacles[MathUtils.random(0, (tentacles.size - 1))]
+            if (chosenTentacle.actions.size == 0 && !chosenTentacle.attacking) {
+                chosenTentacle.addAction(Actions.delay(MathUtils.random(0f, 3f)))
+                /*if (tentaclesAttacking > 3)
+                    return*/
+                chosenTentacle.attacking = true
+                tentaclesAttacking++
+                chosenTentacle.addAction(Actions.sequence(
+                        Actions.sizeTo(chosenTentacle.width, Gdx.graphics.height * .9f - body.height, 5f),
+                        Actions.run {
+                            chosenTentacle.attacking = false
+                            tentaclesAttacking--
+                        },
+                        Actions.sizeTo(chosenTentacle.width, chosenTentacle.height, 5f)
+                ))
+            }
+        }
     }
 
     fun activate() {
@@ -95,6 +126,7 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s){
         active = true
         BaseGame.bossAppearSound!!.play(BaseGame.audioVolume)
         body.addAction(Actions.moveTo(0f, Gdx.graphics.height - body.height, 5f))
+        time = 0f
     }
 
     fun hit(hitPositionX: Float) {
@@ -106,12 +138,12 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s){
                 BaseGame.bossHurtSound!!.play(BaseGame.audioVolume * 1.5f)
 
             // blood effect
-            val effect = BossBloodEffect()
-            effect.setPosition(hitPositionX, body.y - Gdx.graphics.height * .005f) // by trial and error...
-            effect.setScale(Gdx.graphics.height * .00025f)
-            addActor(effect)
-            effect.start()
-            effects.add(effect)
+            if (effectIndex < originalHealthPoints) {
+                val effect = effects.get(effectIndex)
+                effect.setPosition(hitPositionX, body.y - Gdx.graphics.height * .005f) // by trial and error...
+                effect.start()
+                effectIndex++
+            }
 
             // make angry eyes
             if (leftEye.rotation != -20f && leftEye.actions.size == 0)
@@ -120,7 +152,7 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s){
                 rightEye.addAction(Actions.rotateTo(20f, 5f))
 
             for (tentacle in tentacles)
-                tentacle.velocityXMultiplier = 100f
+                tentacle.velocityXMultiplier = 50f
             if (healthPoints <= 0)
                 defeated()
         }
@@ -134,9 +166,9 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s){
             leftEye.addAction(Actions.rotateTo(40f, 1f))
             rightEye.addAction(Actions.rotateTo(-40f, 1f))
             for (tentacle in tentacles)
-                tentacle.defeatedMultiplier = .25f
+                tentacle.defeatedMultiplier = .5f
             body.addAction(Actions.sequence(
-                    Actions.moveTo(originalX, resetPosition, 5f),
+                    Actions.moveTo(0f, resetPosition, 5f),
                     Actions.run {
                         defeated += 1
                         reset()
@@ -158,14 +190,34 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s){
     private fun reset() {
         println("resetting boss!")
         active = false
-        body.setPosition(originalX, resetPosition)
+        body.setPosition(0f, resetPosition)
         body.color.a = 1f
         healthPoints = 30
-        spawnTime = MathUtils.random(17f, 117f)// 60f, 180f)
-        for (effect in effects) effect.remove()
+        spawnTime = MathUtils.random(60f, 180f)
+        for (effect in effects)
+            effect.stop()
+        effectIndex = 0
         leftEye.rotation = 0f
         rightEye.rotation = 0f
-        for (tentacle in tentacles)
+        for (tentacle in tentacles) {
             tentacle.defeatedMultiplier = 1f
+            tentacle.attacking = false
+            tentacle.clearActions()
+            tentacle.addAction(Actions.sizeTo(tentacle.width, tentacle.originalHeight, 1f))
+        }
+
+        time = 0f
+        tentaclesAttacking = 0
+    }
+
+    // Pre-initialized pooled effects in order to change their drawing order
+    private fun addEffects(index: Int) {
+        for (i in 0 until index) {
+            val effect = BossBloodEffect()
+            effect.setScale(Gdx.graphics.height * .00025f)
+            effect.stop()
+            addActor(effect)
+            effects.add(effect)
+        }
     }
 }
