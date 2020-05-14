@@ -7,7 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.utils.Align
 import no.sandramoen.koronakablami.utils.BaseActor
 
-class Explosions(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
+class Explosions(x: Float, y: Float, s: Stage, explosions: Boolean = true) : BaseActor(x, y, s) {
     private var flagRemove = false
 
     init {
@@ -21,8 +21,9 @@ class Explosions(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
         addActor(effect)
         effect.start()
 
-        for (i in 4..15)
-            createRandomExplosion(s)
+        if (explosions)
+            for (i in 4..15)
+                createRandomExplosion(s)
 
         addAction(Actions.sequence( // delayed remove()
                 Actions.delay(1.5f),

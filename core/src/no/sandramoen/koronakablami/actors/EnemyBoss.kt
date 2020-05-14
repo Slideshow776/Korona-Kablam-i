@@ -13,6 +13,7 @@ import no.sandramoen.koronakablami.utils.BaseGame
 class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
     private var originalHealthPoints = 60
     private var healthPoints = 60
+    private var originalShieldPoints = 60
     private var resetPosition = 0f // top offscreen
     private var leftEye: BaseActor
     private var rightEye: BaseActor
@@ -22,8 +23,10 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
     private var tentaclesAttacking = 0
 
     var body: BaseActor
+    var shield: EnemyBossShield
+    var shieldPoints = 60
     var tentacles: Array<EnemyBossTentacles>
-    var spawnTime = MathUtils.random(60f, 180f)
+    var spawnTime = MathUtils.random(7, 7) // 60f, 180f)
     var defeated = 0
     var active = false
 
@@ -38,7 +41,6 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
         // body
         body = BaseActor(x, y, s)
         body.loadImage("enemyBoss1a")
-        body.setBoundaryRectangle()
         body.width = Gdx.graphics.width.toFloat()
         body.height = Gdx.graphics.height * .45f * (Gdx.graphics.width.toFloat() / Gdx.graphics.height.toFloat())
         body.setBoundaryRectangle()
@@ -88,6 +90,10 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
         body.addActor(rightEye)
         rightEye.centerAtPosition(6 * body.width / 8, body.height / 2)
 
+        // shield
+        shield = EnemyBossShield(0f, 0f, s)
+        shield.setPosition(0f, resetPosition - Gdx.graphics.height * .2f)
+
         /*debug = true*/
     }
 
@@ -101,7 +107,7 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
         for (tentacle in tentacles)
             tentacle.y = body.y - tentacle.height * .95f
 
-        if (tentaclesAttacking < 3 && active && time > 10f) {
+        if (tentaclesAttacking < 3 && active && time > 7f) {
             val chosenTentacle = tentacles[MathUtils.random(0, (tentacles.size - 1))]
             if (chosenTentacle.actions.size == 0 && !chosenTentacle.attacking) {
                 chosenTentacle.addAction(Actions.delay(MathUtils.random(0f, 3f)))
@@ -126,7 +132,11 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
         active = true
         BaseGame.bossAppearSound!!.play(BaseGame.audioVolume)
         body.addAction(Actions.moveTo(0f, Gdx.graphics.height - body.height, 5f))
+        shield.addAction(Actions.moveTo(0f, Gdx.graphics.height - body.height - Gdx.graphics.height * .2f, 5f))
+
         time = 0f
+        if (defeated == 0) disableShield()
+        else enableShield()
     }
 
     fun hit(hitPositionX: Float) {
@@ -134,8 +144,17 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
             println("damaging boss! $healthPoints")
             healthPoints -= 1
 
-            if (healthPoints == originalHealthPoints / 2)
+            if (healthPoints == originalHealthPoints / 2) {
                 BaseGame.bossHurtSound!!.play(BaseGame.audioVolume * 1.5f)
+                leftEye.addAction(Actions.sequence(
+                        Actions.scaleTo(1.2f, 1.2f, .25f),
+                        Actions.scaleTo(1.0f, 1.0f, .25f)
+                ))
+                rightEye.addAction(Actions.sequence(
+                        Actions.scaleTo(1.2f, 1.2f, .25f),
+                        Actions.scaleTo(1.0f, 1.0f, .25f)
+                ))
+            }
 
             // blood effect
             if (effectIndex < originalHealthPoints) {
@@ -158,6 +177,23 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
         }
     }
 
+    fun hitShield() {
+        println("damaging shield! $shieldPoints")
+        if (shieldPoints > 0) {
+            BaseGame.hitShieldSound!!.play(BaseGame.audioVolume)
+            shieldPoints--
+            shield.addAction(Actions.sequence(
+                    Actions.alpha(1f, .125f),
+                    Actions.alpha(.4f, .125f),
+                    Actions.alpha(.8f, .125f)
+            ))
+        } else {
+            shield.disableCollision = true
+            shield.clearActions()
+            shield.addAction(Actions.alpha(0f, 2f))
+        }
+    }
+
     private fun defeated() {
         if (body.actions.size == 0) {
             println("defeating boss!")
@@ -174,6 +210,7 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
                         reset()
                     }
             ))
+            shield.addAction(Actions.moveTo(0f, resetPosition - Gdx.graphics.height * .2f, 5f))
         }
     }
 
@@ -184,6 +221,7 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
                     Actions.fadeOut(.5f),
                     Actions.run { reset() }
             ))
+            shield.addAction(Actions.moveTo(0f, resetPosition - Gdx.graphics.height * .2f, 5f))
         }
     }
 
@@ -192,8 +230,12 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
         active = false
         body.setPosition(0f, resetPosition)
         body.color.a = 1f
-        healthPoints = 30
-        spawnTime = MathUtils.random(60f, 180f)
+        healthPoints = originalHealthPoints
+        shieldPoints = originalShieldPoints
+        shield.color.a = .8f
+        shield.disableCollision = false
+        shield.setPosition(0f, resetPosition - Gdx.graphics.height * .2f)
+        spawnTime = MathUtils.random(7, 7) // 60f, 180f)
         for (effect in effects)
             effect.stop()
         effectIndex = 0
@@ -219,5 +261,17 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
             addActor(effect)
             effects.add(effect)
         }
+    }
+
+    private fun enableShield() {
+        shield.color.a = .8f
+        shield.disableCollision = false
+        shield.startShieldBehaviour()
+    }
+
+    private fun disableShield() {
+        shield.color.a = 0f
+        shield.disableCollision = true
+        shield.clearActions()
     }
 }

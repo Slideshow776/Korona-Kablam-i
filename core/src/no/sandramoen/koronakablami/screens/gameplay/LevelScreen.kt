@@ -203,12 +203,12 @@ class LevelScreen : BaseScreen() {
             if (player.overlaps(enemy))
                 playerDeath()
             for (laser: BaseActor in BaseActor.getList(mainStage, Laser::class.java.canonicalName)) {
-                if (enemy.overlaps(laser)) {
+                val tempEnemy = enemy as Enemy
+                if (tempEnemy.overlaps(laser) && !tempEnemy.dead) {
                     BaseGame.explosionsSound!!.play(BaseGame.audioVolume)
-                    val tempEnemy = enemy as Enemy
                     val explosion = Explosions(0f, 0f, mainStage)
                     explosion.centerAtActor(tempEnemy)
-                    if (MathUtils.random(1, 15) == 1) {
+                    if (!tempEnemy.dead && MathUtils.random(1, 15) == 1) {
                         val rna = RNA(0f, 0f, mainStage)
                         rna.centerAtActor(tempEnemy)
                         rna.setSpeed(tempEnemy.getSpeed())
@@ -256,11 +256,20 @@ class LevelScreen : BaseScreen() {
                 boss.hit(laser.x)
                 laser.remove()
             }
+
+            if (laser.overlaps(boss.shield) && !boss.shield.disableCollision) {
+                val explosion = Explosions(0f, 0f, mainStage, false)
+                explosion.centerAtActor(laser)
+                explosion.x += width * .08f
+                boss.hitShield()
+                laser.remove()
+            }
         }
 
         for (tentacle in boss.tentacles)
             if (player.overlaps(tentacle))
-                playerDeath()
+                println("playerDeath()")
+
         tiltTutorial(dt)
     }
 

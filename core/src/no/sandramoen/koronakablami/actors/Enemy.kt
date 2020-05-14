@@ -15,6 +15,8 @@ class Enemy(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
     private var flagRemove = false
     private var playedScream = false
 
+    var dead = false
+
     init {
         width = Gdx.graphics.width * .3f
         height = Gdx.graphics.height * .25f * (Gdx.graphics.width.toFloat() / Gdx.graphics.height.toFloat())
@@ -51,46 +53,48 @@ class Enemy(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
     }
 
     fun die() {
-        body.remove()
-        tentacles.remove()
-        setSpeed(0f)
-        disableCollision = true
+        if (!dead) {
+            body.remove()
+            tentacles.remove()
+            dead = true
+            setSpeed(0f)
 
-        val animationDuration = 1f
-        val a = BaseActor(x - width / 2, y, stage) // left half
-        a.loadImage("enemy3a")
-        a.width = width
-        a.height = height
-        a.centerAtPosition(width / 4, height / 2)
-        addActor(a)
-        a.addAction(Actions.parallel(
-                Actions.moveBy(Gdx.graphics.width * MathUtils.random(-.1f, .1f), Gdx.graphics.height * MathUtils.random(-.1f, .1f), animationDuration),
-                Actions.rotateBy(MathUtils.random(-360f, 360f), animationDuration),
-                Actions.fadeOut(animationDuration),
-                Actions.sequence(
-                        Actions.delay(animationDuration * 2),
-                        Actions.run { flagRemove = true }
-                )
-        ))
+            val animationDuration = 1f
+            val a = BaseActor(x - width / 2, y, stage) // left half
+            a.loadImage("enemy3a")
+            a.width = width
+            a.height = height
+            a.centerAtPosition(width / 4, height / 2)
+            addActor(a)
+            a.addAction(Actions.parallel(
+                    Actions.moveBy(Gdx.graphics.width * MathUtils.random(-.1f, .1f), Gdx.graphics.height * MathUtils.random(-.1f, .1f), animationDuration),
+                    Actions.rotateBy(MathUtils.random(-360f, 360f), animationDuration),
+                    Actions.fadeOut(animationDuration),
+                    Actions.sequence(
+                            Actions.delay(animationDuration * 2),
+                            Actions.run { flagRemove = true }
+                    )
+            ))
 
-        val b = BaseActor(x + width / 2, y, stage) // right half
-        b.loadImage("enemy3b")
-        b.width = width
-        b.height = height
-        b.centerAtPosition(width / 4, height / 2)
-        addActor(b)
-        b.addAction(Actions.parallel(
-                Actions.moveBy(Gdx.graphics.width * MathUtils.random(-.1f, .1f), Gdx.graphics.height * MathUtils.random(-.1f, .1f), animationDuration),
-                Actions.rotateBy(MathUtils.random(0f, 90f), animationDuration),
-                Actions.fadeOut(animationDuration)
-        ))
+            val b = BaseActor(x + width / 2, y, stage) // right half
+            b.loadImage("enemy3b")
+            b.width = width
+            b.height = height
+            b.centerAtPosition(width / 4, height / 2)
+            addActor(b)
+            b.addAction(Actions.parallel(
+                    Actions.moveBy(Gdx.graphics.width * MathUtils.random(-.1f, .1f), Gdx.graphics.height * MathUtils.random(-.1f, .1f), animationDuration),
+                    Actions.rotateBy(MathUtils.random(0f, 90f), animationDuration),
+                    Actions.fadeOut(animationDuration)
+            ))
 
-        // blood effect
-        val effect = BloodEffect()
-        effect.setPosition(width / 4, height / 3) // by trial and error...
-        effect.setScale(Gdx.graphics.height * .00025f)
-        this.addActor(effect)
-        effect.start()
+            // blood effect
+            val effect = BloodEffect()
+            effect.setPosition(width / 4, height / 3) // by trial and error...
+            effect.setScale(Gdx.graphics.height * .00025f)
+            this.addActor(effect)
+            effect.start()
+        }
     }
 
     private fun scream() {
