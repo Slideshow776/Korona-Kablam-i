@@ -1,5 +1,6 @@
 package no.sandramoen.koronakablami.screens.gameplay
 
+import com.badlogic.gdx.Application
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.Color
@@ -162,6 +163,8 @@ class LevelScreen : BaseScreen() {
         )))
 
         tiltTutorialLabel = Label("Tilt to go left or right!", BaseGame.labelStyle)
+        if (Gdx.app.type == Application.ApplicationType.Desktop)
+            tiltTutorialLabel.setText("Move left or right with A and D!")
         tiltTutorialLabel.setFontScale(.35f)
         tiltTutorialLabel.color.a = 0f
 
