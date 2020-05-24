@@ -99,6 +99,7 @@ class Enemy(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
 
     private fun scream() {
         if (!playedScream && !BaseGame.gameOver) {
+            disableCollision = true
             BaseGame.screamSound!!.play(BaseGame.audioVolume)
             body.loadImage("enemy4a")
             body.width = width

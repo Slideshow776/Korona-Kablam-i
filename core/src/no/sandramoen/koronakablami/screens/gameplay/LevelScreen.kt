@@ -223,7 +223,7 @@ class LevelScreen : BaseScreen() {
         }
 
         for (enemy: BaseActor in BaseActor.getList(mainStage, Enemy::class.java.canonicalName)) {
-            if (player.overlaps(enemy))
+            if (player.overlaps(enemy) && !enemy.disableCollision)
                 playerDeath()
             for (laser: BaseActor in BaseActor.getList(mainStage, Laser::class.java.canonicalName)) {
                 val tempEnemy = enemy as Enemy
