@@ -56,6 +56,8 @@ class LevelScreen : BaseScreen() {
     private var tiltTutorialTimer = 0f
     private var tiltTutorialIsActive = false
     private var playTitle2Animation = false
+    private lateinit var leftEyeEffect: ParticleActor
+    private lateinit var rightEyeEffect: ParticleActor
 
     override fun initialize() {
         width = Gdx.graphics.width.toFloat()
@@ -97,7 +99,25 @@ class LevelScreen : BaseScreen() {
         backgrounds.add(Parallax(0f, 0f, mainStage, "bloodCellsBackground3", height * .1f))
         backgrounds.add(Parallax(0f, height, mainStage, "bloodCellsBackground3", height * .1f))
 
+        // boss
         boss = EnemyBoss(0f, height * 1.2f, mainStage)
+
+        // boss laser charging effect from eye
+        val bossLaserCharginTempActor = BaseActor(0f, 0f, mainStage)
+        bossLaserCharginTempActor.width = width
+        bossLaserCharginTempActor.height = height
+
+        leftEyeEffect = LaserChargingEffect()
+        leftEyeEffect.setScale(Gdx.graphics.height * .00025f)
+        bossLaserCharginTempActor.addActor(leftEyeEffect)
+        leftEyeEffect.setPosition(2 * boss.body.width / 8, Gdx.graphics.height - boss.body.height / 2)
+        leftEyeEffect.stop()
+
+        rightEyeEffect = LaserChargingEffect()
+        rightEyeEffect.setScale(Gdx.graphics.height * .00025f)
+        bossLaserCharginTempActor.addActor(rightEyeEffect)
+        rightEyeEffect.setPosition(6 * boss.body.width / 8, Gdx.graphics.height - boss.body.height / 2)
+        rightEyeEffect.stop()
 
         // user interface, overlay menu
         scoreLabelA = Label("Score: ", BaseGame.labelStyle)
@@ -173,9 +193,9 @@ class LevelScreen : BaseScreen() {
         if (titleAnimationPlaying)
             return
 
-        if (!boss.active && enemyPhaseTimer > boss.spawnTime) {
+        if (playerMayShoot && !boss.active && enemyPhaseTimer > boss.spawnTime) {
             boss.activate()
-            if (boss.defeated == 0) setMotivationText("What's this?!", 1.5f)
+            if (boss.numDefeated == 0) setMotivationText("What's this?!", 1.5f)
             else setMotivationText("It's back!", 1.5f)
             enemyPhaseTimer = 0f
             for (i in 10 until backgrounds.size)
@@ -187,6 +207,9 @@ class LevelScreen : BaseScreen() {
             spawnEnemies(dt)
             enemyPhaseTimer += dt
         }
+
+        if (boss.active)
+            laserEyeCharge()
 
         if (BaseGame.gameOver || pause)
             return
@@ -267,9 +290,16 @@ class LevelScreen : BaseScreen() {
         }
 
         for (tentacle in boss.tentacles)
-            if (player.overlaps(tentacle))
-                println("playerDeath()")
+            if (player.overlaps(tentacle) && player.isVisible)
+                playerDeath()
 
+        if (player.overlaps(boss.leftLaser) && !boss.leftLaser.disableCollision && player.isVisible)
+            playerDeath()
+
+        if (player.overlaps(boss.rightLaser) && !boss.rightLaser.disableCollision && player.isVisible)
+            playerDeath()
+
+        boss.player = player
         tiltTutorial(dt)
     }
 
@@ -283,8 +313,9 @@ class LevelScreen : BaseScreen() {
             renderOverlay()
         } else if ((keycode == Keys.BACK || keycode == Keys.ESCAPE) && BaseGame.gameOver)
             Gdx.app.exit()
-        else if (keycode == Keys.BACK || keycode == Keys.ESCAPE)
+        else if (keycode == Keys.BACK || keycode == Keys.ESCAPE) {
             setGameOver()
+        }
         return false
     }
 
@@ -315,7 +346,11 @@ class LevelScreen : BaseScreen() {
             startTitleAnimation()
             overlayScoreLabel.setText("Score: ${score.toLong()}")
         } else { // playing
+            boss.reset()
+            boss.numDefeated = 0
+            boss.numTentaclesThatShouldAttack = 2
             score = 0f
+            enemyPhaseTimer = 0f
             scoreLabelB.setText("${score.toLong()}")
             centerScoreLabel(false)
             player.isVisible = true
@@ -615,5 +650,30 @@ class LevelScreen : BaseScreen() {
         val explosion = Explosions(0f, 0f, mainStage)
         explosion.centerAtPosition(player.x + player.width + width * .04f, player.y + player.height / 2)
         setGameOver()
+    }
+
+    private fun laserEyeCharge() {
+        if (!boss.defeated) {
+            if (boss.leftEyeIsCharging) {
+                leftEyeEffect.isVisible = true
+                if (!leftEyeEffect.isRunning())
+                    leftEyeEffect.start()
+            } else {
+                leftEyeEffect.isVisible = false
+                leftEyeEffect.stop()
+            }
+
+            if (boss.rightEyeIsCharging) {
+                rightEyeEffect.isVisible = true
+                if (!rightEyeEffect.isRunning())
+                    rightEyeEffect.start()
+            } else {
+                rightEyeEffect.isVisible = false
+                rightEyeEffect.stop()
+            }
+        } else {
+            leftEyeEffect.isVisible = false
+            rightEyeEffect.isVisible = false
+        }
     }
 }

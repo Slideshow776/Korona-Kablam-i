@@ -8,7 +8,7 @@ import no.sandramoen.koronakablami.utils.BaseGame
 
 class Laser(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
     init {
-        loadImage("laser")
+        loadImage("laser1")
         width = Gdx.graphics.width * .03f
         height = Gdx.graphics.height * .07f * (Gdx.graphics.width.toFloat() / Gdx.graphics.height.toFloat())
 

@@ -3,6 +3,7 @@ package no.sandramoen.koronakablami.actors
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
+import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.Stage
 import no.sandramoen.koronakablami.utils.BaseActor
@@ -13,6 +14,7 @@ class EnemyBossTentacles(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
     private var vertexShaderCode: String
     private var fragmenterShaderCode: String
     private var shaderProgram: ShaderProgram
+    private var timeToStartShader = MathUtils.random(0f, 5f)
 
     var velocityXMultiplier = 1f
     var defeatedMultiplier = 1f
@@ -55,6 +57,9 @@ class EnemyBossTentacles(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
     override fun act(dt: Float) {
         super.act(dt)
         time += dt
+
+        if (time >= timeToStartShader)
+            runShader = true
 
         if (velocityXMultiplier > 1f) velocityXMultiplier -= .8f
         else if (velocityXMultiplier < 1f) velocityXMultiplier = 1f

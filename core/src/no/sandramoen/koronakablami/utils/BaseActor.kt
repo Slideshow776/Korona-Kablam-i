@@ -178,10 +178,10 @@ open class BaseActor(x: Float, y: Float, s: Stage) : Group() {
     }
 
     // Collision detection ------------------------------------------------------------------------------------------
-    fun setBoundaryRectangle() {
-        val w: Float = width
-        val h: Float = height
-        val vertices: FloatArray = floatArrayOf(0f, 0f, w, 0f, w, h, 0f, h)
+    fun setBoundaryRectangle(x: Float = 0f, y: Float = 0f, w: Float = width, h: Float = height) {
+        /*val w: Float = width
+        val h: Float = height*/
+        val vertices: FloatArray = floatArrayOf(x, y, w, y, w, h, x, h)
         boundaryPolygon = Polygon(vertices)
     }
 

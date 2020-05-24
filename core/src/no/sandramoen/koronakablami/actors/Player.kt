@@ -41,6 +41,7 @@ class Player(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
         addActor(spaceship)
         spaceship.centerAtPosition(width / 2, height / 2)
 
+        /*debug = true*/
     }
 
     override fun act(dt: Float) {
