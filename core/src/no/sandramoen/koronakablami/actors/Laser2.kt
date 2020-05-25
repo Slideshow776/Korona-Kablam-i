@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import no.sandramoen.koronakablami.utils.BaseActor
+import no.sandramoen.koronakablami.utils.BaseGame
 
 class Laser2(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
     init {
@@ -19,7 +20,10 @@ class Laser2(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
         /*debug = true*/
     }
 
-    fun appear() {
+    fun appear(leftEye: Boolean) {
+        if (leftEye) BaseGame.laser1Sound!!.play(BaseGame.audioVolume * .5f)
+        else BaseGame.laser2Sound!!.play(BaseGame.audioVolume * .5f)
+
         disableCollision = false
         val colorSaturation = .7f
         addAction(Actions.forever(Actions.sequence(
@@ -28,13 +32,15 @@ class Laser2(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
         )))
     }
 
-    fun disappearAfterDuration(duration: Float = 0f) {
+    fun disappearAfterDuration(leftEye: Boolean, duration: Float = 0f) {
         addAction(Actions.sequence(
                 Actions.delay(duration),
                 Actions.run {
                     disableCollision = true
                     actions.clear()
                     color.a = 0f
+                    if (leftEye) BaseGame.laser1Sound!!.stop()
+                    else BaseGame.laser2Sound!!.stop()
                 }
         ))
     }

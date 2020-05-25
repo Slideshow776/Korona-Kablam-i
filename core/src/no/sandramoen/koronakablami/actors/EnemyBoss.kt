@@ -35,9 +35,8 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
     var shield: EnemyBossShield
     var shieldPoints = 60
     var tentacles: Array<EnemyBossTentacles>
-    var spawnTime = MathUtils.random(7, 7) // for testing
-
-    // var spawnTime = MathUtils.random(60, 180)
+    // var spawnTime = MathUtils.random(7, 7) // for testing
+    var spawnTime = MathUtils.random(60, 180)
     var numDefeated = 0
     var active = false
     var defeated = false
@@ -161,7 +160,7 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
         }
 
         // eye shooting
-        if (numDefeated >= 3 && time > 7)
+        if (numDefeated >= 0 && time > 7)
             shoot()
     }
 
@@ -265,8 +264,8 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
         time = 0f
         tentaclesAttacking = 0
         hitsTaken = 0
-        spawnTime = MathUtils.random(7, 7) // for testing
-        // spawnTime = MathUtils.random(60, 180)
+        // spawnTime = MathUtils.random(7, 7) // for testing
+        spawnTime = MathUtils.random(60, 180)
 
         body.clearActions()
         body.setPosition(0f, resetPosition)
@@ -284,8 +283,10 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
 
         leftEye.clearActions()
         leftEye.addAction(Actions.rotateTo(0f))
+        leftEye.addAction(Actions.scaleTo(1f, 1f, 0f))
         rightEye.clearActions()
         rightEye.addAction(Actions.rotateTo(0f))
+        rightEye.addAction(Actions.scaleTo(1f, 1f, 0f))
 
         leftLaser.isVisible = false
         leftLaser.disableCollision = true
@@ -300,6 +301,11 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
             tentacle.clearActions()
             tentacle.addAction(Actions.sizeTo(tentacle.width, tentacle.originalHeight, 1f))
         }
+
+        BaseGame.laserCharge1Sound!!.stop()
+        BaseGame.laserCharge2Sound!!.stop()
+        BaseGame.laser1Sound!!.stop()
+        BaseGame.laser2Sound!!.stop()
     }
 
     private fun shoot() {
@@ -389,19 +395,25 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
         eye.addAction(Actions.parallel(
                 Actions.sequence(
                         Actions.run {
-                            if (isLeft) leftEyeIsCharging = true
-                            else rightEyeIsCharging = true
+                            if (isLeft) {
+                                BaseGame.laserCharge1Sound!!.play(BaseGame.audioVolume * .5f)
+                                leftEyeIsCharging = true
+                            } else {
+                                BaseGame.laserCharge2Sound!!.play(BaseGame.audioVolume * .5f)
+                                rightEyeIsCharging = true
+                            }
                         },
                         Actions.delay(10f), // fixed frequency to match particle effects
                         Actions.run {
                             if (isLeft) {
+                                BaseGame.laserCharge1Sound!!.stop()
                                 leftEyeIsCharging = false
                             } else {
+                                BaseGame.laserCharge2Sound!!.stop()
                                 rightEyeIsCharging = false
                             }
-                            laser.appear()
+                            laser.appear(isLeft)
 
-                            /**/
                             // both eyes pick a side and fires toward the center
                             if (isLeft && MathUtils.randomBoolean()) { // shooting right
                                 laser.rotation = 27f
@@ -418,9 +430,7 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
                                 laser.addAction(Actions.rotateBy(-65f, laserSpeed))
                             }
 
-                            // laser.addAction(Actions.rotateTo(thetaInDegrees, laserSpeed))
-                            /**/
-                            laser.disappearAfterDuration(laserDuration)
+                            laser.disappearAfterDuration(isLeft, laserDuration)
                             laser.setPosition(
                                     eye.x + eye.width / 2 - laser.width / 2,
                                     (Gdx.graphics.height - (body.height / 2)) - laser.height
