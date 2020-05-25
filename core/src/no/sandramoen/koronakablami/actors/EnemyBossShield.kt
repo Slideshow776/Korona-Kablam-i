@@ -21,9 +21,9 @@ class EnemyBossShield(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
                         Actions.alpha(.7f, 1f)
                 ),
                 Actions.sequence(
-                        Actions.moveBy(0f, Gdx.graphics.height * .005f, 1.5f),
-                        Actions.moveBy(0f, Gdx.graphics.height * -.01f, 3f),
-                        Actions.moveBy(0f, Gdx.graphics.height * .005f, 1.5f)
+                        Actions.moveBy(0f, Gdx.graphics.height * .005f, 2f),
+                        Actions.moveBy(0f, Gdx.graphics.height * -.01f, 4f),
+                        Actions.moveBy(0f, Gdx.graphics.height * .005f, 2f)
                 )
         )))
     }

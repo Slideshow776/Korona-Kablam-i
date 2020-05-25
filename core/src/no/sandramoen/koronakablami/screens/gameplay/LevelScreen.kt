@@ -267,7 +267,13 @@ class LevelScreen : BaseScreen() {
         }
 
         for (laser: BaseActor in BaseActor.getList(mainStage, Laser::class.java.canonicalName)) {
-            if (laser.overlaps(boss.body)) {
+            if (laser.overlaps(boss.shield) && !boss.shield.disableCollision) {
+                val explosion = Explosions(0f, 0f, mainStage, false)
+                explosion.centerAtActor(laser)
+                explosion.x += width * .08f
+                boss.hitShield()
+                laser.remove()
+            } else if (laser.overlaps(boss.body)) {
                 BaseGame.explosionsSound!!.play(BaseGame.audioVolume)
                 val explosion = Explosions(0f, 0f, mainStage)
                 explosion.centerAtActor(laser)
@@ -283,13 +289,7 @@ class LevelScreen : BaseScreen() {
                 laser.remove()
             }
 
-            if (laser.overlaps(boss.shield) && !boss.shield.disableCollision) {
-                val explosion = Explosions(0f, 0f, mainStage, false)
-                explosion.centerAtActor(laser)
-                explosion.x += width * .08f
-                boss.hitShield()
-                laser.remove()
-            }
+
         }
 
         for (tentacle in boss.tentacles)

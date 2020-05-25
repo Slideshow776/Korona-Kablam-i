@@ -29,13 +29,14 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
     private var rightEyeShouldShoot = false
     private var laserDuration = 1.0f
     private var laserSpeed = 6.5f
+    private var hitsTaken = 0
 
     var body: BaseActor
     var shield: EnemyBossShield
     var shieldPoints = 60
     var tentacles: Array<EnemyBossTentacles>
-    // var spawnTime = MathUtils.random(7, 7) // for testing
-    var spawnTime = MathUtils.random(60, 180)
+    var spawnTime = MathUtils.random(7, 7) // for testing
+    // var spawnTime = MathUtils.random(60, 180)
     var numDefeated = 0
     var active = false
     var defeated = false
@@ -132,9 +133,11 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
 
         if (active) time += dt
 
+        // bleeding effect
         for (effect in bossBloodEffects)
             effect.y = body.y
 
+        // tentacles
         for (tentacle in tentacles)
             tentacle.y = body.y - tentacle.height * .95f
         if (tentaclesAttacking < numTentaclesThatShouldAttack && active && time > 7f) {
@@ -146,16 +149,17 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
                 chosenTentacle.attacking = true
                 tentaclesAttacking++
                 chosenTentacle.addAction(Actions.sequence(
-                        Actions.sizeTo(chosenTentacle.width, Gdx.graphics.height * .9f - body.height, 5f),
+                        Actions.sizeTo(chosenTentacle.width, Gdx.graphics.height * .9f - body.height, MathUtils.random(5.25f, 6.5f)),
                         Actions.run {
                             chosenTentacle.attacking = false
                             tentaclesAttacking--
                         },
-                        Actions.sizeTo(chosenTentacle.width, chosenTentacle.height, 5f)
+                        Actions.sizeTo(chosenTentacle.width, chosenTentacle.height, MathUtils.random(5.25f, 6.5f))
                 ))
             }
         }
 
+        // eye shooting
         if (numDefeated >= 3 && time > 7)
             shoot()
     }
@@ -224,12 +228,7 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
                 bossBloodEffectIndex++
             }
 
-            // make angry eyes
-            if (leftEye.rotation != -20f)
-                leftEye.addAction((Actions.rotateTo(-20f, 5f)))
-            if (rightEye.rotation != 20f) {
-                rightEye.addAction(Actions.rotateTo(20f, 5f))
-            }
+            checkIfAngryEyes()
 
             for (tentacle in tentacles)
                 tentacle.velocityXMultiplier = 50f
@@ -248,6 +247,7 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
                     Actions.alpha(.4f, .125f),
                     Actions.alpha(.8f, .125f)
             ))
+            checkIfAngryEyes()
         } else {
             shield.disableCollision = true
             shield.clearActions()
@@ -266,13 +266,15 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
         shield.color.a = .8f
         shield.disableCollision = false
         shield.setPosition(0f, resetPosition - Gdx.graphics.height * .2f)
-        // spawnTime = MathUtils.random(7, 7) // for testing
-        spawnTime = MathUtils.random(60, 180)
+        spawnTime = MathUtils.random(7, 7) // for testing
+        // spawnTime = MathUtils.random(60, 180)
         for (effect in bossBloodEffects)
             effect.stop()
         bossBloodEffectIndex = 0
-        leftEye.rotation = 0f
-        rightEye.rotation = 0f
+        leftEye.clearActions()
+        leftEye.addAction(Actions.rotateTo(0f))
+        rightEye.clearActions()
+        rightEye.addAction(Actions.rotateTo(0f))
         leftLaser.isVisible = true
         rightLaser.isVisible = true
         for (tentacle in tentacles) {
@@ -283,6 +285,7 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
         }
         time = 0f
         tentaclesAttacking = 0
+        hitsTaken = 0
     }
 
     private fun shoot() {
@@ -321,17 +324,6 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
                 tentacle.defeatedMultiplier = .5f
             body.addAction(Actions.sequence(
                     Actions.moveTo(0f, resetPosition, 5f),
-                    Actions.run { reset() }
-            ))
-            shield.addAction(Actions.moveTo(0f, resetPosition - Gdx.graphics.height * .2f, 5f))
-        }
-    }
-
-    private fun die() {
-        if (body.actions.size == 0) {
-            println("killing boss!")
-            body.addAction(Actions.sequence(
-                    Actions.fadeOut(.5f),
                     Actions.run { reset() }
             ))
             shield.addAction(Actions.moveTo(0f, resetPosition - Gdx.graphics.height * .2f, 5f))
@@ -437,5 +429,17 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
                         Actions.scaleBy(-.5f, -.5f, 1f)
                 )
         ))
+    }
+
+    private fun checkIfAngryEyes() {
+        hitsTaken++
+        // make angry eyes
+        if (hitsTaken == 12) {
+            if (leftEye.rotation != -20f)
+                leftEye.addAction((Actions.rotateTo(-20f, 5f)))
+            if (rightEye.rotation != 20f) {
+                rightEye.addAction(Actions.rotateTo(20f, 5f))
+            }
+        }
     }
 }
