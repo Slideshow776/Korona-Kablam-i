@@ -27,8 +27,8 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
     private var tentaclesAttacking = 0
     private var leftEyeShouldShoot = false
     private var rightEyeShouldShoot = false
-    private var laserDuration = 1.0f
-    private var laserSpeed = 6.5f
+    private var laserDuration = 2f
+    private var laserSpeed = 30f
     private var hitsTaken = 0
 
     var body: BaseActor
@@ -36,6 +36,7 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
     var shieldPoints = 60
     var tentacles: Array<EnemyBossTentacles>
     var spawnTime = MathUtils.random(7, 7) // for testing
+
     // var spawnTime = MathUtils.random(60, 180)
     var numDefeated = 0
     var active = false
@@ -160,7 +161,7 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
         }
 
         // eye shooting
-        if (numDefeated >= 3 && time > 7)
+        if (numDefeated >= 0 && time > 7)
             shoot()
     }
 
@@ -190,9 +191,9 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
         else enableShield()
 
         if (laserDuration < 2)
-            laserDuration += .1f
+            laserDuration += .2f
         if (laserSpeed > 5)
-            laserSpeed -= .1f
+            laserSpeed -= .5f
 
         if (numDefeated % 10 == 0 && numDefeated > 0)
             numTentaclesThatShouldAttack++
@@ -259,33 +260,44 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
         println("resetting boss!, $numDefeated")
         active = false
         defeated = false
+        time = 0f
+        tentaclesAttacking = 0
+        hitsTaken = 0
+        spawnTime = MathUtils.random(7, 7) // for testing
+        // spawnTime = MathUtils.random(60, 180)
+
+        body.clearActions()
         body.setPosition(0f, resetPosition)
         body.color.a = 1f
+
         healthPoints = originalHealthPoints
         shieldPoints = originalShieldPoints
         shield.color.a = .8f
         shield.disableCollision = false
         shield.setPosition(0f, resetPosition - Gdx.graphics.height * .2f)
-        spawnTime = MathUtils.random(7, 7) // for testing
-        // spawnTime = MathUtils.random(60, 180)
+
         for (effect in bossBloodEffects)
             effect.stop()
         bossBloodEffectIndex = 0
+
         leftEye.clearActions()
         leftEye.addAction(Actions.rotateTo(0f))
         rightEye.clearActions()
         rightEye.addAction(Actions.rotateTo(0f))
-        leftLaser.isVisible = true
-        rightLaser.isVisible = true
+
+        leftLaser.isVisible = false
+        leftLaser.disableCollision = true
+        leftEyeIsCharging = false
+        rightLaser.isVisible = false
+        rightLaser.disableCollision = true
+        rightEyeIsCharging = false
+
         for (tentacle in tentacles) {
             tentacle.defeatedMultiplier = 1f
             tentacle.attacking = false
             tentacle.clearActions()
             tentacle.addAction(Actions.sizeTo(tentacle.width, tentacle.originalHeight, 1f))
         }
-        time = 0f
-        tentaclesAttacking = 0
-        hitsTaken = 0
     }
 
     private fun shoot() {
@@ -293,11 +305,13 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
             if (leftEyeShouldShoot) {
                 println("boss is shooting from left")
                 leftEyeShouldShoot = false
+                leftLaser.isVisible = true
                 firingLaser(leftEye, leftLaser, calculateLaserRotation(leftLaser), true)
             }
             if (rightEyeShouldShoot) {
                 println("boss is shooting from right")
                 rightEyeShouldShoot = false
+                rightLaser.isVisible = true
                 firingLaser(rightEye, rightLaser, calculateLaserRotation(rightLaser), false)
             }
         }
@@ -316,9 +330,15 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
 
             // make sad eyes, (assumes angry eyes)
             leftEye.clearActions()
-            leftEye.addAction(Actions.rotateTo(40f, 1f))
+            leftEye.addAction(Actions.parallel(
+                    Actions.rotateTo(25f, 1f),
+                    Actions.scaleTo(1f, 1f, 1f)
+            ))
             rightEye.clearActions()
-            rightEye.addAction(Actions.rotateTo(-40f, 1f))
+            rightEye.addAction(Actions.parallel(
+                    Actions.rotateTo(-25f, 1f),
+                    Actions.scaleTo(1f, 1f, 1f)
+            ))
 
             for (tentacle in tentacles)
                 tentacle.defeatedMultiplier = .5f
@@ -381,19 +401,19 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
 
                             /**/
                             // both eyes pick a side and fires toward the center
-                            if (isLeft && MathUtils.randomBoolean()) {
-                                laser.rotation = 30f
-                                laser.addAction(Actions.rotateBy(-60f, laserSpeed))
-                            } else if (isLeft){
-                                laser.rotation = -12f
-                                laser.addAction(Actions.rotateBy(60f, laserSpeed))
+                            if (isLeft && MathUtils.randomBoolean()) { // shooting right
+                                laser.rotation = 27f
+                                laser.addAction(Actions.rotateBy(-65f, laserSpeed))
+                            } else if (isLeft) { // shooting left
+                                laser.rotation = -10f
+                                laser.addAction(Actions.rotateBy(65f, laserSpeed))
                             }
-                            if (!isLeft && MathUtils.randomBoolean()) {
-                                laser.rotation = -30f
-                                laser.addAction(Actions.rotateBy(60f, laserSpeed))
-                            } else if (!isLeft) {
+                            if (!isLeft && MathUtils.randomBoolean()) { // shooting left
+                                laser.rotation = -27f
+                                laser.addAction(Actions.rotateBy(65f, laserSpeed))
+                            } else if (!isLeft) { // shooting right
                                 laser.rotation = 12f
-                                laser.addAction(Actions.rotateBy(-60f, laserSpeed))
+                                laser.addAction(Actions.rotateBy(-65f, laserSpeed))
                             }
 
                             // laser.addAction(Actions.rotateTo(thetaInDegrees, laserSpeed))
