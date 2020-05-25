@@ -161,7 +161,7 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
         }
 
         // eye shooting
-        if (numDefeated >= 0 && time > 7)
+        if (numDefeated >= 3 && time > 7)
             shoot()
     }
 
@@ -170,7 +170,7 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
         active = true
         BaseGame.bossAppearSound!!.play(BaseGame.audioVolume)
         body.addAction(Actions.moveTo(0f, Gdx.graphics.height - body.height, 5f))
-        shield.addAction(Actions.moveTo(0f, Gdx.graphics.height - body.height - Gdx.graphics.height * .2f, 5f))
+        shield.addAction(Actions.moveTo(0f, Gdx.graphics.height - body.height - Gdx.graphics.height * .162f, 5f))
 
         body.addAction(Actions.parallel(
                 Actions.sequence(
@@ -190,10 +190,12 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
         if (numDefeated == 0) disableShield()
         else enableShield()
 
-        if (laserDuration < 2)
-            laserDuration += .2f
-        if (laserSpeed > 5)
-            laserSpeed -= .5f
+        if (numDefeated >= 3) {
+            if (laserDuration < 2)
+                laserDuration += .4f
+            if (laserSpeed > 5)
+                laserSpeed -= .8f
+        }
 
         if (numDefeated % 10 == 0 && numDefeated > 0)
             numTentaclesThatShouldAttack++

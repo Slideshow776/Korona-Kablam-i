@@ -653,10 +653,10 @@ class LevelScreen : BaseScreen() {
     }
 
     private fun playerDeath() {
-        /*BaseGame.explosionsSound!!.play(BaseGame.audioVolume)
+        BaseGame.explosionsSound!!.play(BaseGame.audioVolume)
         val explosion = Explosions(0f, 0f, mainStage)
         explosion.centerAtPosition(player.x + player.width + width * .04f, player.y + player.height / 2)
-        setGameOver()*/
+        setGameOver()
     }
 
     private fun laserEyeCharge() {
