@@ -160,7 +160,7 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
         }
 
         // eye shooting
-        if (numDefeated >= 0 && time > 7)
+        if (numDefeated >= 3 && time > 7)
             shoot()
     }
 
@@ -334,9 +334,14 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
             rightLaser.isVisible = false
             rightEyeIsCharging = false
             leftEyeIsCharging = false
-            BaseGame.bossDefeatedSound!!.play(BaseGame.audioVolume)
 
-            // make sad eyes, (assumes angry eyes)
+            BaseGame.bossDefeatedSound!!.play(BaseGame.audioVolume)
+            BaseGame.laserCharge1Sound!!.stop()
+            BaseGame.laserCharge2Sound!!.stop()
+            BaseGame.laser1Sound!!.stop()
+            BaseGame.laser2Sound!!.stop()
+
+            // make sad eyes
             leftEye.clearActions()
             leftEye.addAction(Actions.parallel(
                     Actions.rotateTo(25f, 1f),

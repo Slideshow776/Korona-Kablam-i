@@ -201,12 +201,16 @@ class LevelScreen : BaseScreen() {
             if (boss.numDefeated == 0) setMotivationText("What's this?!", 1.5f)
             else setMotivationText("It's back!", 1.5f)
             enemyPhaseTimer = 0f
-            for (i in 10 until backgrounds.size)
-                backgrounds[i].addAction(Actions.fadeOut(5f, Interpolation.pow5Out))
+            for (i in 10 until backgrounds.size) {
+                if (backgrounds[i].actions.size == 0)
+                    backgrounds[i].addAction(Actions.fadeOut(5f, Interpolation.pow5Out))
+            }
         } else if (!boss.active) {
             if (backgrounds[10].color.a == 0f)
-                for (i in 10 until backgrounds.size)
-                    backgrounds[i].addAction(Actions.fadeIn(5f))
+                for (i in 10 until backgrounds.size) {
+                    if (backgrounds[i].actions.size == 0)
+                        backgrounds[i].addAction(Actions.fadeIn(5f))
+                }
             spawnEnemies(dt)
             enemyPhaseTimer += dt
         }
@@ -362,6 +366,7 @@ class LevelScreen : BaseScreen() {
             centerScoreLabel(false)
             player.isVisible = true
             player.setPosition(width / 2f - player.width / 2f, height * .03f)
+            motivationLabel.setText("")
 
             for (enemy: BaseActor in BaseActor.getList(mainStage, Enemy::class.java.canonicalName))
                 enemy.remove()
