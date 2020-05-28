@@ -21,8 +21,8 @@ class Laser2(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
     }
 
     fun appear(leftEye: Boolean) {
-        if (leftEye) BaseGame.laser1Sound!!.play(BaseGame.audioVolume * .5f)
-        else BaseGame.laser2Sound!!.play(BaseGame.audioVolume * .5f)
+        if (leftEye && !BaseGame.gameOver) BaseGame.laser1Sound!!.play(BaseGame.audioVolume * .5f)
+        else if (!BaseGame.gameOver)BaseGame.laser2Sound!!.play(BaseGame.audioVolume * .5f)
 
         disableCollision = false
         val colorSaturation = .7f

@@ -58,8 +58,8 @@ abstract class BaseGame : Game(), AssetErrorListener {
         var bossHurtSound: Sound? = null
         var bossDefeatedSound: Sound? = null
         var hitShieldSound: Sound? = null
-        var laserCharge1Sound: Sound? = null
-        var laserCharge2Sound: Sound? = null
+        var laserCharge1Sound: Music? = null // need to be a Music in order to not trigger a weird sound-blocking/aborting bug
+        var laserCharge2Sound: Music? = null // need to be a Music in order to not trigger a weird sound-blocking/aborting bug
         var laser1Sound: Sound? = null
         var laser2Sound: Sound? = null
         var audioVolume = .5f
@@ -93,8 +93,8 @@ abstract class BaseGame : Game(), AssetErrorListener {
         assetManager.load("audio/Hit_Hurt48.wav", Sound::class.java)
         assetManager.load("audio/Hit_Hurt49.wav", Sound::class.java)
         assetManager.load("audio/Hit_Hurt52.wav", Sound::class.java)
-        assetManager.load("audio/407052__sojan__power-charge_10s.wav", Sound::class.java)
-        assetManager.load("audio/407052__sojan__power-charge_10s - Copy.wav", Sound::class.java)
+        assetManager.load("audio/320365__n-audioman__growingdistortion-pitchshifthighs.wav", Music::class.java)
+        assetManager.load("audio/320365__n-audioman__growingdistortion-pitchshifthighs - Copy.wav", Music::class.java)
         assetManager.load("audio/318205__deleted-user-4798915__wierd-laser.wav", Sound::class.java)
         assetManager.load("audio/318205__deleted-user-4798915__wierd-laser - Copy.wav", Sound::class.java)
         val resolver = InternalFileHandleResolver()
@@ -126,8 +126,8 @@ abstract class BaseGame : Game(), AssetErrorListener {
         bossHurtSound = assetManager.get("audio/Hit_Hurt48.wav", Sound::class.java)
         bossAppearSound = assetManager.get("audio/Hit_Hurt49.wav", Sound::class.java)
         hitShieldSound = assetManager.get("audio/Hit_Hurt52.wav", Sound::class.java)
-        laserCharge1Sound = assetManager.get("audio/407052__sojan__power-charge_10s.wav", Sound::class.java)
-        laserCharge2Sound = assetManager.get("audio/407052__sojan__power-charge_10s - Copy.wav", Sound::class.java)
+        laserCharge1Sound = assetManager.get("audio/320365__n-audioman__growingdistortion-pitchshifthighs.wav", Music::class.java)
+        laserCharge2Sound = assetManager.get("audio/320365__n-audioman__growingdistortion-pitchshifthighs - Copy.wav", Music::class.java)
         laser1Sound = assetManager.get("audio/318205__deleted-user-4798915__wierd-laser.wav", Sound::class.java)
         laser2Sound = assetManager.get("audio/318205__deleted-user-4798915__wierd-laser - Copy.wav", Sound::class.java)
 

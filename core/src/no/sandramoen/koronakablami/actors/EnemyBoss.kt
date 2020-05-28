@@ -49,7 +49,6 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
 
     init {
         // parent
-        println("initializing boss...")
         width = Gdx.graphics.width.toFloat()
         height = Gdx.graphics.height.toFloat()
         setPosition(0f, 0f)
@@ -165,7 +164,6 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
     }
 
     fun activate() {
-        println("activating boss...")
         active = true
         BaseGame.bossAppearSound!!.play(BaseGame.audioVolume)
         body.addAction(Actions.moveTo(0f, Gdx.graphics.height - body.height, 5f))
@@ -206,7 +204,6 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
 
     fun hit(hitPositionX: Float) {
         if (active && healthPoints >= 0f) {
-            println("damaging boss! $healthPoints")
             healthPoints -= 1
 
             // make surprised eyes
@@ -240,7 +237,6 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
     }
 
     fun hitShield() {
-        println("damaging shield! $shieldPoints")
         if (shieldPoints > 0) {
             BaseGame.hitShieldSound!!.play(BaseGame.audioVolume)
             shieldPoints--
@@ -258,7 +254,6 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
     }
 
     fun reset() { // all of this happens to the boss off-screen
-        println("resetting boss!, $numDefeated")
         active = false
         defeated = false
         time = 0f
@@ -311,23 +306,20 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
     private fun shoot() {
         if (player != null && !defeated) {
             if (leftEyeShouldShoot) {
-                println("boss is shooting from left")
                 leftEyeShouldShoot = false
                 leftLaser.isVisible = true
-                firingLaser(leftEye, leftLaser, calculateLaserRotation(leftLaser), true)
+                firingLaser(leftEye, leftLaser, true)
             }
             if (rightEyeShouldShoot) {
-                println("boss is shooting from right")
                 rightEyeShouldShoot = false
                 rightLaser.isVisible = true
-                firingLaser(rightEye, rightLaser, calculateLaserRotation(rightLaser), false)
+                firingLaser(rightEye, rightLaser, false)
             }
         }
     }
 
     private fun defeated() {
         if (body.actions.size == 0) {
-            println("defeating boss!")
             numDefeated += 1
             defeated = true
             leftLaser.isVisible = false
@@ -396,15 +388,21 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
         return thetaInDegrees
     }
 
-    private fun firingLaser(eye: BaseActor, laser: Laser2, thetaInDegrees: Float, isLeft: Boolean) {
+    private fun firingLaser(eye: BaseActor, laser: Laser2, isLeft: Boolean) {
         eye.addAction(Actions.parallel(
                 Actions.sequence(
                         Actions.run {
                             if (isLeft) {
-                                BaseGame.laserCharge1Sound!!.play(BaseGame.audioVolume * .5f)
+                                if (!BaseGame.gameOver) {
+                                    BaseGame.laserCharge1Sound!!.play()
+                                    BaseGame.laserCharge1Sound!!.volume = BaseGame.audioVolume * .6f
+                                }
                                 leftEyeIsCharging = true
                             } else {
-                                BaseGame.laserCharge2Sound!!.play(BaseGame.audioVolume * .5f)
+                                if (!BaseGame.gameOver) {
+                                    BaseGame.laserCharge2Sound!!.play()
+                                    BaseGame.laserCharge2Sound!!.volume = BaseGame.audioVolume * .6f
+                                }
                                 rightEyeIsCharging = true
                             }
                         },
@@ -459,7 +457,6 @@ class EnemyBoss(x: Float, y: Float, s: Stage) : BaseActor(x, y, s) {
                                         }
                                 )
                         )
-
                 ),
                 Actions.sequence( // make charging eyes
                         Actions.scaleBy(.5f, .5f, 10f),
