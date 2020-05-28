@@ -403,14 +403,14 @@ class LevelScreen : BaseScreen() {
     private fun checkHighScore() {
         if (score > BaseGame.highScore) {
             BaseGame.highScore = score
-            overlayScoreLabel.color = Color.ORANGE
+            overlayScoreLabel.color = Color.WHITE
             scoreLabelA.addAction(Actions.color(Color.ORANGE, 1f))
             scoreLabelB.addAction(Actions.color(Color.ORANGE, 1f))
             if (playNewHighScoreSoundOnce && score >= 400L)
                 BaseGame.newHighScoreSound!!.play(BaseGame.audioVolume)
             playNewHighScoreSoundOnce = false
             highScoreLabel.setText("New High Score: ${BaseGame.highScore.toLong()}")
-            highScoreLabel.color = Color.PURPLE
+            highScoreLabel.color = Color.ORANGE
         }
     }
 
