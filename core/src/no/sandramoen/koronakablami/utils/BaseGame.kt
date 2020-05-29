@@ -62,6 +62,7 @@ abstract class BaseGame : Game(), AssetErrorListener {
         var laserCharge2Sound: Music? = null // need to be a Music in order to not trigger a weird sound-blocking/aborting bug
         var laser1Sound: Sound? = null
         var laser2Sound: Sound? = null
+        var typeWriterSound: Sound? = null
         var audioVolume = .5f
         var miss = false
         var gameOver = true
@@ -97,6 +98,7 @@ abstract class BaseGame : Game(), AssetErrorListener {
         assetManager.load("audio/320365__n-audioman__growingdistortion-pitchshifthighs - Copy.wav", Music::class.java)
         assetManager.load("audio/318205__deleted-user-4798915__wierd-laser.wav", Sound::class.java)
         assetManager.load("audio/318205__deleted-user-4798915__wierd-laser - Copy.wav", Sound::class.java)
+        assetManager.load("audio/Blip_Select50.wav", Sound::class.java)
         val resolver = InternalFileHandleResolver()
         assetManager.setLoader(FreeTypeFontGenerator::class.java, FreeTypeFontGeneratorLoader(resolver))
         assetManager.setLoader(BitmapFont::class.java, ".ttf", FreetypeFontLoader(resolver))
@@ -130,6 +132,7 @@ abstract class BaseGame : Game(), AssetErrorListener {
         laserCharge2Sound = assetManager.get("audio/320365__n-audioman__growingdistortion-pitchshifthighs - Copy.wav", Music::class.java)
         laser1Sound = assetManager.get("audio/318205__deleted-user-4798915__wierd-laser.wav", Sound::class.java)
         laser2Sound = assetManager.get("audio/318205__deleted-user-4798915__wierd-laser - Copy.wav", Sound::class.java)
+        typeWriterSound = assetManager.get("audio/Blip_Select50.wav", Sound::class.java)
 
         // text files
         defaultShader = assetManager.get("shaders/default.vs", Text::class.java).getString()
