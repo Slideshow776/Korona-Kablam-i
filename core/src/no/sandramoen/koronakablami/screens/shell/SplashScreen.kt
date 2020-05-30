@@ -6,7 +6,6 @@ import com.badlogic.gdx.scenes.scene2d.Event
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import no.sandramoen.koronakablami.actors.ShockwaveBackground
-import no.sandramoen.koronakablami.screens.gameplay.LevelScreen
 import no.sandramoen.koronakablami.utils.BaseActor
 import no.sandramoen.koronakablami.utils.BaseGame
 import no.sandramoen.koronakablami.utils.BaseScreen
@@ -42,7 +41,7 @@ class SplashScreen : BaseScreen() {
                 ))
         background.addAction(Actions.after(Actions.run {
             dispose()
-            BaseGame.setActiveScreen(LevelScreen())
+            BaseGame.setActiveScreen(IntroScreen())
         }))
     }
 

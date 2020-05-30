@@ -7,28 +7,29 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
+import no.sandramoen.koronakablami.screens.gameplay.LevelScreen
 import no.sandramoen.koronakablami.utils.BaseActor
 import no.sandramoen.koronakablami.utils.BaseGame
 import no.sandramoen.koronakablami.utils.BaseScreen
+import no.sandramoen.koronakablami.utils.GameUtils
 
 class IntroScreen : BaseScreen() {
     private lateinit var touchToSkipLabel: Label
     private lateinit var bottomLabel: Label
+    private lateinit var topSceneTable: Table
+    private var screenWidth = 0f
+    private var topSceneMaxHeight = 0f
+    private var time = 0f
 
     override fun initialize() {
-        val screenWidth = Gdx.graphics.width.toFloat()
+        screenWidth = Gdx.graphics.width.toFloat()
         val screenHeight = Gdx.graphics.height.toFloat()
 
-        val topSceneTable = Table()
-        val topSceneMaxHeight = (screenHeight * .96f) * 5 / 6
-        /*val topActor = BaseActor(0f, 0f, uiStage)
-        topActor.loadImage("whitePixel")
-        topActor.width = screenWidth
-        topActor.height = topSceneMaxHeight
-        topActor.color = Color.ORANGE
-        topSceneTable.add(topActor)*/
-        /*val topLabel = Label("I'm on top!", BaseGame.labelStyle)
-        topSceneTable.add(topLabel)*/
+        topSceneTable = Table()
+        topSceneMaxHeight = (screenHeight * .96f) * 5 / 6
+        createTopActor("introBackground0", 60f)
+        createTopActor("introCity0", 60f)
+        createTopActor("introCity1", 80f)
 
         val bottomSceneTable = Table()
         val bottomSceneMaxHeight = (screenHeight * .96f) * 1 / 6
@@ -38,21 +39,18 @@ class IntroScreen : BaseScreen() {
         bottomLabel.setWrap(true)
         bottomLabel.width = screenWidth * .9f
         bottomLabel.setAlignment(Align.center)
-        bottomSceneTable.add(bottomLabel).width(screenWidth * .9f)//.padLeft(screenWidth * .1f).padRight(screenWidth * .05f)
+        bottomSceneTable.add(bottomLabel).width(screenWidth * .9f)
         /*bottomSceneTable.debug = true*/
         bottomScene()
 
         touchToSkipLabel = Label("Touch to skip!", BaseGame.labelStyle)
         touchToSkipLabel.setFontScale(.25f)
-        touchToSkipLabel.addAction(Actions.forever(Actions.sequence(
-                Actions.alpha(1f, .5f),
-                Actions.alpha(.5f, .5f)
-        )))
+        GameUtils.pulseLabel(touchToSkipLabel)
 
         val sceneTable = Table()
         sceneTable.add(topSceneTable).width(screenWidth).height(topSceneMaxHeight).row()
         sceneTable.add(bottomSceneTable).width(screenWidth).height(bottomSceneMaxHeight)
-        sceneTable.debug = true
+        /*sceneTable.debug = true*/
 
         val mainTable = Table()
         mainTable.setFillParent(true)
@@ -67,15 +65,31 @@ class IntroScreen : BaseScreen() {
         blackOverlay.touchable = Touchable.childrenOnly
         blackOverlay.setSize(screenWidth, screenHeight)
         blackOverlay.addAction(Actions.fadeOut(2f))
-
         uiTable.add(blackOverlay)
     }
 
-    override fun update(dt: Float) {}
+    override fun update(dt: Float) {
+        time += dt
+    }
+
+    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        if (time > 1.5f) {
+            BaseGame.setActiveScreen(IntroScreen()) // TODO: change this to LevelScreen
+            // BaseGame.setActiveScreen(LevelScreen()) // TODO: change this to LevelScreen
+        }
+        return false
+    }
+
+    override fun keyDown(keycode: Int): Boolean { // desktop controls
+        if (time > 1.5f) {
+            BaseGame.setActiveScreen(IntroScreen()) // TODO: change this to LevelScreen
+            // BaseGame.setActiveScreen(LevelScreen()) // TODO: change this to LevelScreen
+        }
+        return false
+    }
 
     private fun bottomScene() {
-        val bottomScene = BaseActor(0f, 0f, mainStage) // placeholder for queuing actions...
-        bottomScene.addAction(Actions.sequence(
+        bottomLabel.addAction(Actions.sequence(
                 Actions.delay(1f),
                 Actions.run { slowText(bottomLabel, "The year is 2020...") },
                 Actions.run { bottomLabel.addAction(Actions.after(Actions.delay(3f))) },
@@ -92,10 +106,19 @@ class IntroScreen : BaseScreen() {
                     Actions.run {
                         renderingText += text[i]
                         label.setText(renderingText)
-                        BaseGame.typeWriterSound!!.play()
+                        BaseGame.typeWriterSound!!.play(BaseGame.audioVolume * .5f)
                     },
                     Actions.delay(.08f)
             )))
         }
+    }
+
+    private fun createTopActor(name: String, speed: Float) {
+        val topActor = BaseActor(0f, 0f, uiStage)
+        topActor.loadImage(name)
+        topActor.width = screenWidth * 4
+        topActor.height = topSceneMaxHeight
+        topActor.addAction(Actions.moveTo(-topActor.width + screenWidth, 0f, speed))
+        topSceneTable.add(topActor)
     }
 }

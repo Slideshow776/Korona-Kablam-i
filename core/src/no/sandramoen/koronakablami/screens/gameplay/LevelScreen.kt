@@ -157,10 +157,7 @@ class LevelScreen : BaseScreen() {
 
         touchToStartLabel = Label("Touch to start!", BaseGame.labelStyle)
         touchToStartLabel.setFontScale(.25f)
-        touchToStartLabel.addAction(Actions.forever(Actions.sequence(
-                Actions.alpha(1f, .5f),
-                Actions.alpha(.5f, .5f)
-        )))
+        GameUtils.pulseLabel(touchToStartLabel)
 
         tiltTutorialLabel = Label("Tilt to go left or right!", BaseGame.labelStyle)
         if (Gdx.app.type == Application.ApplicationType.Desktop)
@@ -587,10 +584,7 @@ class LevelScreen : BaseScreen() {
             tiltTutorialLabel.addAction(Actions.fadeOut(1f))
         } else if (!player.hasMoved && !tiltTutorialIsActive) {
             tiltTutorialIsActive = true
-            tiltTutorialLabel.addAction(Actions.forever(Actions.sequence(
-                    Actions.alpha(1f, .5f),
-                    Actions.alpha(.5f, .5f)
-            )))
+            GameUtils.pulseLabel(tiltTutorialLabel)
         }
     }
 
