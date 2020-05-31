@@ -2,12 +2,12 @@ package no.sandramoen.koronakablami.screens.shell
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
-import no.sandramoen.koronakablami.screens.gameplay.LevelScreen
 import no.sandramoen.koronakablami.utils.BaseActor
 import no.sandramoen.koronakablami.utils.BaseGame
 import no.sandramoen.koronakablami.utils.BaseScreen
@@ -27,9 +27,11 @@ class IntroScreen : BaseScreen() {
 
         topSceneTable = Table()
         topSceneMaxHeight = (screenHeight * .96f) * 5 / 6
-        createTopActor("introBackground0", 60f)
+        createTopActor("introBackground0", 60f).addAction(Actions.color(Color(.11f, .541f, .0f, 1f), 20f)) // fade in to green
+        createTopActor("introCity3", 150f)
+        createTopActor("introCity2", 120f)
+        createTopActor("introCity1", 90f)
         createTopActor("introCity0", 60f)
-        createTopActor("introCity1", 80f)
 
         val bottomSceneTable = Table()
         val bottomSceneMaxHeight = (screenHeight * .96f) * 1 / 6
@@ -66,6 +68,9 @@ class IntroScreen : BaseScreen() {
         blackOverlay.setSize(screenWidth, screenHeight)
         blackOverlay.addAction(Actions.fadeOut(2f))
         uiTable.add(blackOverlay)
+
+        GameUtils.setMusicVolumeAndPlay(BaseGame.cityAmbientMusic, BaseGame.audioVolume * 1.2f)
+        GameUtils.setMusicVolumeAndPlay(BaseGame.introMusic, BaseGame.audioVolume * .9f)
     }
 
     override fun update(dt: Float) {
@@ -76,6 +81,12 @@ class IntroScreen : BaseScreen() {
         if (time > 1.5f) {
             BaseGame.setActiveScreen(IntroScreen()) // TODO: change this to LevelScreen
             // BaseGame.setActiveScreen(LevelScreen()) // TODO: change this to LevelScreen
+            BaseGame.cityAmbientMusic!!.stop()
+            BaseGame.introMusic!!.stop()
+
+            // for debug purposes only
+            GameUtils.setMusicVolumeAndPlay(BaseGame.cityAmbientMusic, BaseGame.audioVolume * 1.1f)
+            GameUtils.setMusicVolumeAndPlay(BaseGame.introMusic, BaseGame.audioVolume * .9f)
         }
         return false
     }
@@ -84,17 +95,23 @@ class IntroScreen : BaseScreen() {
         if (time > 1.5f) {
             BaseGame.setActiveScreen(IntroScreen()) // TODO: change this to LevelScreen
             // BaseGame.setActiveScreen(LevelScreen()) // TODO: change this to LevelScreen
+            BaseGame.introMusic!!.stop()
+            BaseGame.cityAmbientMusic!!.stop()
+
+            // for debug purposes only
+            GameUtils.setMusicVolumeAndPlay(BaseGame.cityAmbientMusic, BaseGame.audioVolume * 1.1f)
+            GameUtils.setMusicVolumeAndPlay(BaseGame.introMusic, BaseGame.audioVolume * .9f)
         }
         return false
     }
 
     private fun bottomScene() {
         bottomLabel.addAction(Actions.sequence(
-                Actions.delay(1f),
+                Actions.delay(3f),
                 Actions.run { slowText(bottomLabel, "The year is 2020...") },
-                Actions.run { bottomLabel.addAction(Actions.after(Actions.delay(3f))) },
-                Actions.run { slowText(bottomLabel, "A new Corona Virus is wreaking havoc upon society...") },
-                Actions.run { bottomLabel.addAction(Actions.after(Actions.delay(3f))) },
+                Actions.run { bottomLabel.addAction(Actions.after(Actions.delay(4.5f))) },
+                Actions.run { slowText(bottomLabel, "A new Corona Virus is wreaking havoc upon the world...") },
+                Actions.run { bottomLabel.addAction(Actions.after(Actions.delay(4.5f))) },
                 Actions.run { slowText(bottomLabel, "As a last-ditch effort to save humanity, nanorobots were dispatched using 5G technology to exterminate the threat...") }
         ))
     }
@@ -108,17 +125,18 @@ class IntroScreen : BaseScreen() {
                         label.setText(renderingText)
                         BaseGame.typeWriterSound!!.play(BaseGame.audioVolume * .5f)
                     },
-                    Actions.delay(.08f)
+                    Actions.delay(.085f)
             )))
         }
     }
 
-    private fun createTopActor(name: String, speed: Float) {
+    private fun createTopActor(name: String, speed: Float): BaseActor {
         val topActor = BaseActor(0f, 0f, uiStage)
         topActor.loadImage(name)
         topActor.width = screenWidth * 4
         topActor.height = topSceneMaxHeight
         topActor.addAction(Actions.moveTo(-topActor.width + screenWidth, 0f, speed))
         topSceneTable.add(topActor)
+        return topActor
     }
 }

@@ -63,6 +63,8 @@ abstract class BaseGame : Game(), AssetErrorListener {
         var laser1Sound: Sound? = null
         var laser2Sound: Sound? = null
         var typeWriterSound: Sound? = null
+        var cityAmbientMusic: Music? = null
+        var introMusic: Music? = null
         var audioVolume = .5f
         var miss = false
         var gameOver = true
@@ -99,6 +101,8 @@ abstract class BaseGame : Game(), AssetErrorListener {
         assetManager.load("audio/318205__deleted-user-4798915__wierd-laser.wav", Sound::class.java)
         assetManager.load("audio/318205__deleted-user-4798915__wierd-laser - Copy.wav", Sound::class.java)
         assetManager.load("audio/Blip_Select50.wav", Sound::class.java)
+        assetManager.load("audio/cityAmbient.wav", Music::class.java)
+        assetManager.load("audio/393839__michael-db__synthmadnessv1.mp3", Music::class.java)
         val resolver = InternalFileHandleResolver()
         assetManager.setLoader(FreeTypeFontGenerator::class.java, FreeTypeFontGeneratorLoader(resolver))
         assetManager.setLoader(BitmapFont::class.java, ".ttf", FreetypeFontLoader(resolver))
@@ -133,6 +137,8 @@ abstract class BaseGame : Game(), AssetErrorListener {
         laser1Sound = assetManager.get("audio/318205__deleted-user-4798915__wierd-laser.wav", Sound::class.java)
         laser2Sound = assetManager.get("audio/318205__deleted-user-4798915__wierd-laser - Copy.wav", Sound::class.java)
         typeWriterSound = assetManager.get("audio/Blip_Select50.wav", Sound::class.java)
+        cityAmbientMusic = assetManager.get("audio/cityAmbient.wav", Music::class.java)
+        introMusic = assetManager.get("audio/393839__michael-db__synthmadnessv1.mp3", Music::class.java)
 
         // text files
         defaultShader = assetManager.get("shaders/default.vs", Text::class.java).getString()

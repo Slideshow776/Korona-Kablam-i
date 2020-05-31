@@ -65,8 +65,7 @@ class LevelScreen : BaseScreen() {
         height = Gdx.graphics.height.toFloat()
 
         BaseGame.levelMusic!!.isLooping = true
-        BaseGame.levelMusic!!.volume = BaseGame.audioVolume
-        BaseGame.levelMusic!!.play()
+        GameUtils.setMusicVolumeAndPlay(BaseGame.levelMusic, BaseGame.audioVolume)
 
         backgrounds = Array<Parallax>()
         backgrounds.add(Parallax(0f, 0f, mainStage, "background4", height * .032f))

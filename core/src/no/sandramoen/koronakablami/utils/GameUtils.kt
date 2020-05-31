@@ -1,5 +1,6 @@
 package no.sandramoen.koronakablami.utils
 
+import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.scenes.scene2d.Event
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
@@ -25,6 +26,11 @@ class GameUtils {
                     Actions.alpha(1f, .5f),
                     Actions.alpha(.5f, .5f)
             )))
+        }
+
+        fun setMusicVolumeAndPlay(music: Music?, volume: Float) {
+            music!!.play()
+            music!!.volume = volume
         }
     }
 }
