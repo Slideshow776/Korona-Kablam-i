@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.scenes.scene2d.Group
+import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Stack
@@ -179,8 +180,21 @@ class LevelScreen : BaseScreen() {
         uiTable.add(tiltTutorialLabel).colspan(4).padBottom(height * .15f).row()
         uiTable.add().expandY()
 
+        // black transition overlay
+        val blackOverlay = BaseActor(0f, 0f, mainStage)
+        blackOverlay.loadImage("whitePixel")
+        blackOverlay.color = Color.BLACK
+        blackOverlay.touchable = Touchable.childrenOnly
+        blackOverlay.setSize(width, height)
+        blackOverlay.addAction(Actions.fadeOut(1f))
+
+        val stack = Stack()
+        stack.setFillParent(true)
+        stack.add(uiTable)
+        stack.add(blackOverlay)
+
         /*uiTable.debug = true*/
-        uiStage.addActor(uiTable)
+        uiStage.addActor(stack)
 
         startTitleAnimation()
     }

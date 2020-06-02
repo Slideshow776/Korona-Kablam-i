@@ -1,13 +1,14 @@
 package no.sandramoen.koronakablami.screens.shell
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
+import no.sandramoen.koronakablami.screens.gameplay.LevelScreen
 import no.sandramoen.koronakablami.utils.BaseActor
 import no.sandramoen.koronakablami.utils.BaseGame
 import no.sandramoen.koronakablami.utils.BaseScreen
@@ -20,6 +21,7 @@ class IntroScreen : BaseScreen() {
     private var screenWidth = 0f
     private var topSceneMaxHeight = 0f
     private var time = 0f
+    private lateinit var blackOverlay: BaseActor
 
     override fun initialize() {
         screenWidth = Gdx.graphics.width.toFloat()
@@ -27,7 +29,7 @@ class IntroScreen : BaseScreen() {
 
         topSceneTable = Table()
         topSceneMaxHeight = (screenHeight * .96f) * 5 / 6
-        createTopActor("introBackground0", 60f).addAction(Actions.color(Color(.11f, .541f, .0f, 1f), 20f)) // fade in to green
+        createTopActor("introBackground0", 60f).addAction(Actions.color(Color(.11f, .541f, .0f, 1f), 20f))
         createTopActor("introCity3", 150f)
         createTopActor("introCity2", 120f)
         createTopActor("introCity1", 90f)
@@ -61,7 +63,7 @@ class IntroScreen : BaseScreen() {
         mainStage.addActor(mainTable)
 
         // black transition overlay
-        val blackOverlay = BaseActor(0f, 0f, mainStage)
+        blackOverlay = BaseActor(0f, 0f, mainStage)
         blackOverlay.loadImage("whitePixel")
         blackOverlay.color = Color.BLACK
         blackOverlay.touchable = Touchable.childrenOnly
@@ -75,32 +77,32 @@ class IntroScreen : BaseScreen() {
 
     override fun update(dt: Float) {
         time += dt
+        if (!BaseGame.introMusic!!.isPlaying)
+            fadeToLevelScreen()
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         if (time > 1.5f) {
-            BaseGame.setActiveScreen(IntroScreen()) // TODO: change this to LevelScreen
-            // BaseGame.setActiveScreen(LevelScreen()) // TODO: change this to LevelScreen
-            BaseGame.cityAmbientMusic!!.stop()
-            BaseGame.introMusic!!.stop()
+            // BaseGame.setActiveScreen(IntroScreen()) // TODO: change this to LevelScreen
+            fadeToLevelScreen()
 
             // for debug purposes only
-            GameUtils.setMusicVolumeAndPlay(BaseGame.cityAmbientMusic, BaseGame.audioVolume * 1.1f)
-            GameUtils.setMusicVolumeAndPlay(BaseGame.introMusic, BaseGame.audioVolume * .9f)
+            /*GameUtils.setMusicVolumeAndPlay(BaseGame.cityAmbientMusic, BaseGame.audioVolume * 1.1f)
+            GameUtils.setMusicVolumeAndPlay(BaseGame.introMusic, BaseGame.audioVolume * .9f)*/
         }
         return false
     }
 
     override fun keyDown(keycode: Int): Boolean { // desktop controls
-        if (time > 1.5f) {
-            BaseGame.setActiveScreen(IntroScreen()) // TODO: change this to LevelScreen
-            // BaseGame.setActiveScreen(LevelScreen()) // TODO: change this to LevelScreen
-            BaseGame.introMusic!!.stop()
-            BaseGame.cityAmbientMusic!!.stop()
+        if (keycode == Input.Keys.ENTER || keycode == Input.Keys.ESCAPE || keycode == Input.Keys.SPACE) {
+            if (time > 1.5f) {
+                // BaseGame.setActiveScreen(IntroScreen()) // TODO: change this to LevelScreen
+                fadeToLevelScreen()
 
-            // for debug purposes only
-            GameUtils.setMusicVolumeAndPlay(BaseGame.cityAmbientMusic, BaseGame.audioVolume * 1.1f)
-            GameUtils.setMusicVolumeAndPlay(BaseGame.introMusic, BaseGame.audioVolume * .9f)
+                // for debug purposes only
+                /*GameUtils.setMusicVolumeAndPlay(BaseGame.cityAmbientMusic, BaseGame.audioVolume * 1.1f)
+            GameUtils.setMusicVolumeAndPlay(BaseGame.introMusic, BaseGame.audioVolume * .9f)*/
+            }
         }
         return false
     }
@@ -138,5 +140,14 @@ class IntroScreen : BaseScreen() {
         topActor.addAction(Actions.moveTo(-topActor.width + screenWidth, 0f, speed))
         topSceneTable.add(topActor)
         return topActor
+    }
+
+    private fun fadeToLevelScreen() {
+        BaseGame.introMusic!!.stop()
+        BaseGame.cityAmbientMusic!!.stop()
+        blackOverlay.addAction(Actions.sequence(
+                Actions.fadeIn(1f),
+                Actions.run { BaseGame.setActiveScreen(LevelScreen()) }
+        ))
     }
 }
