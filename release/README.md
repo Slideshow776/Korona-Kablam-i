@@ -1,13 +1,13 @@
 # Installing the Game
 ## To play on **Desktop**:
-Java must be installed on your device.
+[Java](https://www.java.com/ES/download/) must be installed on your device.
 * Click `Korona Kablam-i!.jar`
 * Click "Download"
 * Double click to run
    * Alternatively:
       * Open a terminal (cmd)
       * Navigate to the file `$cd [path]`
-      * Run `$java -jar Suicide.jar`
+      * Run `$java -jar "Korona Kablam-i!.jar"`
 
 ## To play on Andoid:
 * Click `Korona Kablam-i!.apk`
