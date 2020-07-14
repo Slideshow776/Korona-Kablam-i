@@ -12,5 +12,5 @@ Java must be installed on your device.
 ## To play on Andoid:
 * Click `Korona Kablam-i!.apk`
 * Download the file.
-* Disable any operating system warnings about installing the app
+* Consent to any operating system warnings about installing the app
 * Install and play
