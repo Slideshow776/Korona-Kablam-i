@@ -8,6 +8,7 @@
       * Open a terminal (cmd)
       * Navigate to the file `$cd [path]`
       * Run `$java -jar "Korona Kablam-i!.jar"`
+      
 Game controls: A and D to move, space or left-mouse button to shoot
 
 ## To play on Andoid:
