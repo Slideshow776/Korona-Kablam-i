@@ -14,5 +14,5 @@ Game controls: A and D to move, space or left-mouse button to shoot
 ## To play on Andoid:
 * Click `Korona Kablam-i!.apk`
 * Download the file.
-* Consent to any operating system warnings about installing the app
+* Consent to any warnings about installing the app
 * Install and play
